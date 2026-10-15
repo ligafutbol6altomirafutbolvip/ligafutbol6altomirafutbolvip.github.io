@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Clasificación, jornadas, goleadores y estadísticas de la Liga Fútbol 6 Altomira.">
+<meta property="og:title" content="Liga Fútbol 6 Altomira">
+<meta property="og:description" content="Clasificación, resultados y estadísticas de la liga, actualizados cada jornada.">
+<meta name="theme-color" content="#0b100c">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Liga Fútbol 6 Altomira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: club-brand night pitch — sticky jornada tabs, one column of panels, tables scroll inside their own box */
+:root{
+  --bg:#0b100c; --surface:#121a14; --surface-2:#18231b; --line:#26352a;
+  --fg:#eef3ea; --muted:#9aaa9c; --lime:#c8f235; --lime-ink:#0b100c;
+  --gold:#e8bf4a; --silver:#c9d0d6; --yellow:#f2d23c; --red:#ef4b45; --win:#7fdc6a; --draw:#c9d0d6; --loss:#ef6b5e;
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+header.hero{background:radial-gradient(120% 90% at 50% 0%, #1d3a1f 0%, var(--bg) 70%);border-bottom:1px solid var(--line)}
+header .wrap{padding-block:28px 22px}
+.eyebrow{font-family:var(--display);font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-size:13px}
+h1{font-family:var(--display);font-style:italic;font-weight:900;text-transform:uppercase;font-size:clamp(38px,9vw,68px);line-height:.92;margin:6px 0 8px;text-wrap:balance}
+h1 span{color:var(--lime)}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--muted);font-size:14px}
+.meta b{color:var(--fg);font-weight:600}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;flex-wrap:wrap;gap:4px;padding-block:8px}
+@media (max-width:720px){nav.tabs .wrap{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}}
+nav.tabs .wrap::-webkit-scrollbar{display:none}
+.tab{font-family:var(--display);font-weight:700;font-style:italic;text-transform:uppercase;letter-spacing:.04em;font-size:17px;color:var(--muted);background:none;border:0;padding:8px 12px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.tab:hover{color:var(--fg)}
+.tab[aria-selected="true"]{background:var(--lime);color:var(--lime-ink)}
+.tab:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+main .wrap{padding-block:22px 48px;display:grid;gap:22px}
+section[hidden]{display:none}
+h2{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;font-size:28px;line-height:1;margin:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h2 small{font-family:var(--body);font-style:normal;font-weight:500;text-transform:none;font-size:13px;color:var(--muted)}
+h3{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:16px;margin:0;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.stack{display:grid;gap:14px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:13px;color:var(--muted);text-align:center;padding:8px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 6px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+th.l,td.l{text-align:left}
+td.pos{font-family:var(--display);font-weight:800;font-style:italic;font-size:20px;width:34px}
+tr.cut td{border-bottom:2px solid color-mix(in srgb,var(--lime) 55%,transparent)}
+tr.p1 td.pos{color:var(--gold)} tr.p2 td.pos{color:var(--silver)}
+td.team{font-weight:600;white-space:normal;min-width:150px}
+td.pts{font-family:var(--display);font-weight:800;font-size:20px;color:var(--lime)}
+.form{display:inline-flex;gap:3px}
+.form i{width:18px;height:18px;border-radius:4px;font-style:normal;font-size:11px;font-weight:700;display:grid;place-items:center;color:var(--lime-ink)}
+.form .W{background:var(--win)} .form .D{background:var(--draw)} .form .L{background:var(--loss)}
+.form .none{color:var(--muted);font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;color:var(--muted);font-size:13px}
+.prize{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
+.prize.g{background:color-mix(in srgb,var(--gold) 22%,transparent);color:var(--gold)}
+.prize.s{background:color-mix(in srgb,var(--silver) 18%,transparent);color:var(--silver)}
+.jsel{display:flex;gap:6px;flex-wrap:wrap}
+.jbtn{font-family:var(--display);font-weight:700;font-size:16px;min-width:40px;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.jbtn.done{border-color:color-mix(in srgb,var(--lime) 40%,var(--line))}
+.jbtn[aria-pressed="true"]{background:var(--lime);color:var(--lime-ink);border-color:var(--lime)}
+.match{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid var(--line)}
+.match:last-child{border-bottom:0}
+.match .t{font-weight:600;min-width:0}
+.match .t.h{text-align:right}
+.score{font-family:var(--display);font-weight:800;font-style:italic;font-size:28px;min-width:84px;text-align:center;font-variant-numeric:tabular-nums}
+.score.pend{font-size:15px;font-style:normal;font-weight:600;color:var(--muted);font-family:var(--body)}
+.mdetail{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;font-size:13px;color:var(--muted)}
+.mdetail .h{text-align:right}
+.mdetail .full{grid-column:1/-1;text-align:center}
+.card-y,.card-r{display:inline-block;width:9px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:4px}
+.card-y{background:var(--yellow)} .card-r{background:var(--red)}
+.rest{color:var(--muted);font-size:14px;text-align:center;padding-top:12px;border-top:1px dashed var(--line);margin-top:2px}
+.rest b{color:var(--fg);font-weight:600}
+.st{display:block;font-family:var(--body);font-style:normal;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+.st.prov{color:var(--yellow)} .st.ofi{color:var(--muted)}
+.mvpline{grid-column:1/-1}
+.jmvp{margin-top:10px;padding-top:12px;border-top:1px dashed var(--line);text-align:center;font-size:14px;color:var(--muted)}
+.jmvp b{color:var(--lime);font-weight:700}
+.bracket{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px;align-items:center}
+.bk{display:grid;gap:8px}
+.bk .lab{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--muted)}
+.slot{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+.slot .seed{font-family:var(--display);font-weight:800;font-style:italic;color:var(--muted)}
+.slot .sc{font-family:var(--display);font-weight:800;font-size:20px;font-variant-numeric:tabular-nums}
+.slot.win{border-color:var(--lime)} .slot.win .sc{color:var(--lime)}
+.slot.tbd{color:var(--muted)}
+.final .slot{background:color-mix(in srgb,var(--lime) 8%,var(--surface-2))}
+.champ{text-align:center;font-family:var(--display);font-style:italic;font-weight:900;text-transform:uppercase;font-size:28px;color:var(--gold)}
+.goal{display:grid;gap:10px}
+.goal video{width:100%;max-width:100%;border-radius:8px;background:#000;aspect-ratio:16/9}
+.goal .who{font-weight:600}
+.goal .sub{color:var(--muted);font-size:13px}
+.btn{display:inline-block;font-weight:600;color:var(--lime-ink);background:var(--lime);padding:8px 14px;border-radius:6px;text-decoration:none;justify-self:start}
+.big{font-family:var(--display);font-style:italic;font-weight:900;text-transform:uppercase;font-size:clamp(26px,6vw,38px);line-height:1;margin:4px 0}
+.offer h4{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;font-size:20px;margin:0 0 4px;color:var(--lime)}
+.offer p{margin:0}
+.offer .where{color:var(--muted);font-size:13px;margin-top:6px}
+.cyc{display:inline-flex;gap:4px;vertical-align:middle}
+.cyc i{width:10px;height:14px;border-radius:2px;border:1px solid color-mix(in srgb,var(--yellow) 60%,transparent)}
+.cyc i.on{background:var(--yellow);border-color:var(--yellow)}
+td.wrapc{white-space:normal;min-width:140px}
+.empty{color:var(--muted);text-align:center;padding:22px 8px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px}
+.teamcard h4{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;font-size:22px;margin:0 0 2px}
+.teamcard .del{color:var(--muted);font-size:13px;margin-bottom:10px}
+.teamcard ol{margin:0;padding-left:22px;columns:1;font-size:14px}
+.teamcard li{padding:2px 0}
+.teamcard li::marker{color:var(--muted);font-variant-numeric:tabular-nums}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.chip.warn{color:var(--yellow);border-color:color-mix(in srgb,var(--yellow) 45%,transparent)}
+.chip.bad{color:var(--red);border-color:color-mix(in srgb,var(--red) 50%,transparent)}
+.awards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.award h4{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;font-size:24px;color:var(--lime);margin:0}
+.award p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.award .lead{color:var(--fg);font-weight:600;margin-top:8px}
+.rules{display:grid;gap:10px;font-size:14px}
+.rules details{border-top:1px solid var(--line);padding-top:10px}
+.rules summary{cursor:pointer;font-weight:600}
+.rules p{margin:6px 0 0;color:var(--muted)}
+footer{color:var(--muted);font-size:13px;text-align:center}
+.mine{background:color-mix(in srgb,var(--lime) 10%,transparent)}
+.match.mine{border-radius:8px;padding-inline:8px}
+.pick{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.pick label{font-size:13px;color:var(--muted)}
+select{font:inherit;font-weight:600;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 10px;max-width:100%}
+.myteam{border-color:color-mix(in srgb,var(--lime) 45%,var(--line))}
+.myteam .row{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:8px}
+.myteam .k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.myteam .v{font-weight:600}
+.notice{border-left:3px solid var(--lime)}
+.notice.alert{border-left-color:var(--yellow)}
+.notice .d{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.notice h4{margin:2px 0 4px;font-size:16px}
+.notice p{margin:0;color:var(--muted)}
+.tchips{display:flex;flex-wrap:wrap;gap:6px}
+.tchip{font:inherit;font-weight:600;font-size:14px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.tchip[aria-pressed="true"]{background:var(--lime);color:var(--lime-ink);border-color:var(--lime)}
+.linkbtn{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.linkbtn:hover{text-decoration-color:var(--lime)}
+.cal{display:grid;gap:0}
+.cal .r{display:grid;grid-template-columns:44px 1fr auto;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);align-items:center}
+.cal .r:last-child{border-bottom:0}
+.cal .j{font-family:var(--display);font-weight:800;font-style:italic;color:var(--muted)}
+.res{font-family:var(--display);font-weight:800;font-size:18px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.res.W{color:var(--win)} .res.D{color:var(--draw)} .res.L{color:var(--loss)}
+.cronica{font-size:15px;line-height:1.55;margin:4px 0 8px;max-width:65ch}
+.st.apl{color:var(--yellow)}
+.sponsors{border-top:1px solid var(--line);padding-top:18px;display:grid;gap:10px}
+.sponsors h3{text-align:center}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px}
+.sp{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center;display:grid;gap:4px;align-content:center;text-decoration:none;color:inherit}
+.sp b{font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;font-size:20px}
+.sp span{color:var(--muted);font-size:13px}
+.sp.main{border-color:color-mix(in srgb,var(--gold) 50%,var(--line))}
+.sp.main b{color:var(--gold)}
+.sp.free{border-style:dashed}
+.sp.free b{color:var(--muted)}
+@media (max-width:520px){
+  .score{font-size:24px;min-width:64px}
+  .hide-sm{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Complejo Altomira · Temporada 2026–27</div>
+    <h1>Liga Fútbol 6 <span>Altomira</span></h1>
+    <div class="meta" id="meta"></div>
+    <div class="pick"><label for="myteam">Mi equipo</label><select id="myteam"></select></div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Secciones">
+  <div class="wrap" role="tablist">
+    <button class="tab" role="tab" data-t="proxima">Próxima jornada</button>
+    <button class="tab" role="tab" data-t="clasificacion">Clasificación</button>
+    <button class="tab" role="tab" data-t="jornadas">Jornadas</button>
+    <button class="tab" role="tab" data-t="playoffs">Play-offs</button>
+    <button class="tab" role="tab" data-t="pichichi">Pichichi</button>
+    <button class="tab" role="tab" data-t="mvp">MVP</button>
+    <button class="tab" role="tab" data-t="puskas">Puskás</button>
+    <button class="tab" role="tab" data-t="zamora">Zamora</button>
+    <button class="tab" role="tab" data-t="aficion">Mejor afición</button>
+    <button class="tab" role="tab" data-t="tarjetas">Tarjetas</button>
+    <button class="tab" role="tab" data-t="ofertas">Ofertas</button>
+    <button class="tab" role="tab" data-t="equipos">Equipos</button>
+    <button class="tab" role="tab" data-t="premios">Premios y normas</button>
+  </div>
+</nav>
+
+<main><div class="wrap">
+
+<section id="proxima" class="stack">
+  <div id="avisos" class="stack"></div>
+  <div class="panel myteam" id="pxmine" hidden></div>
+  <h2>Próxima jornada <small id="px-sub"></small></h2>
+  <div class="panel" id="pxview"></div>
+  <div class="panel" id="pxapl" hidden></div>
+  <div class="grid2">
+    <div class="panel" id="pxsanc"></div>
+    <div class="panel" id="pxlast"></div>
+  </div>
+</section>
+
+<section id="clasificacion" class="stack" hidden>
+  <h2>Clasificación <small id="cl-sub"></small></h2>
+  <div class="panel scroll"><table id="tbl"></table></div>
+  <div class="legend">
+    <span>Victoria 3 · Empate 1 · Derrota 0</span>
+    <span>18 partidos por equipo. Los 4 primeros juegan los play-offs (1.º–4.º y 2.º–3.º) y la final decide el campeón.</span>
+    <span>Desempate: enfrentamientos directos, después diferencia de goles general y goles a favor</span>
+    <span><span style="color:var(--yellow)">*</span> Tiene un partido aplazado pendiente</span>
+  </div>
+</section>
+
+<section id="jornadas" class="stack" hidden>
+  <h2>Jornadas</h2>
+  <div class="jsel" id="jsel"></div>
+  <div class="panel" id="jview"></div>
+</section>
+
+<section id="playoffs" class="stack" hidden>
+  <h2>Play-offs <small>Los 4 primeros · partido único</small></h2>
+  <div class="bracket" id="bracket"></div>
+  <div class="legend"><span>Semifinales: 1.º contra 4.º y 2.º contra 3.º. Los ganadores juegan la final: el ganador es el campeón y el perdedor el subcampeón, y se llevan los premios de 1.º y 2.º.</span></div>
+</section>
+
+<section id="pichichi" class="stack" hidden>
+  <h2>Pichichi <small>Máximo goleador</small></h2>
+  <div class="panel scroll"><table id="tpich"></table></div>
+  <h3>Asistencias</h3>
+  <div class="panel scroll"><table id="tasis"></table></div>
+</section>
+
+<section id="mvp" class="stack" hidden>
+  <h2>MVP <small>Mejor jugador de cada jornada</small></h2>
+  <div class="panel" id="mvprank"></div>
+  <div class="panel scroll"><table id="tmvp"></table></div>
+</section>
+
+<section id="puskas" class="stack" hidden>
+  <h2>Puskás <small>Mejor gol de la temporada</small></h2>
+  <div class="panel" id="pkwin"></div>
+  <div id="pklist" class="stack"></div>
+</section>
+
+<section id="zamora" class="stack" hidden>
+  <h2>Zamora <small>Portero menos goleado</small></h2>
+  <div class="panel scroll"><table id="tzam"></table></div>
+  <div class="legend"><span>Se ordena por media de goles encajados por partido.</span></div>
+</section>
+
+<section id="aficion" class="stack" hidden>
+  <h2>Mejor afición</h2>
+  <div class="panel" id="afview"></div>
+</section>
+
+<section id="tarjetas" class="stack" hidden>
+  <h2>Tarjetas</h2>
+  <div class="panel" id="sanc"></div>
+  <div class="stack">
+    <h3>Amarillas acumuladas <span style="text-transform:none;letter-spacing:0;font-weight:500">· cada 3 amarillas, 1 partido de sanción</span></h3>
+    <div class="panel scroll"><table id="tyellow"></table></div>
+  </div>
+  <div class="stack">
+    <h3>Tarjetas rojas <span style="text-transform:none;letter-spacing:0;font-weight:500">· doble amarilla o roja directa</span></h3>
+    <div class="panel scroll"><table id="tred"></table></div>
+  </div>
+  <div class="stack">
+    <h3>Juego limpio <span style="text-transform:none;letter-spacing:0;font-weight:500">· menos puntos, más deportivo</span></h3>
+    <div class="panel scroll"><table id="tfair"></table></div>
+    <div class="legend"><span>Amarilla 1 punto · Doble amarilla 3 puntos · Roja directa 4 puntos</span></div>
+  </div>
+</section>
+
+<section id="ofertas" class="stack" hidden>
+  <h2>Ofertas de la semana <small>Restaurante, tiendas y pistas</small></h2>
+  <div id="ofview" class="stack"></div>
+</section>
+
+<section id="equipos" class="stack" hidden>
+  <h2>Equipos</h2>
+  <div class="tchips" id="tchips"></div>
+  <div id="ficha" class="stack"></div>
+</section>
+
+<section id="premios" class="stack" hidden>
+  <h2>Premios</h2>
+  <div class="awards" id="awards"></div>
+  <div class="panel rules">
+    <h3>Normas principales</h3>
+    <details><summary>Formato y duración</summary><p>5 jugadores de campo más portero. Dos partes de 25 minutos a reloj corrido con 5 minutos de descanso. Cambios ilimitados. Cada equipo lleva un balón.</p></details>
+    <details><summary>Equipación y dorsal</summary><p>Camiseta del mismo color para todo el equipo; si coincide con el rival, el visitante usa petos. El portero lleva un color distinto. Dorsal obligatorio para registrar goles, MVP y tarjetas.</p></details>
+    <details><summary>Puntualidad</summary><p>Presentarse al menos 10 minutos antes. Más de 10 minutos de retraso sin causa justificada: partido perdido 0–3. Con 4 jugadores más portero el partido empieza y el resto se incorpora al llegar.</p></details>
+    <details><summary>Aplazamientos y cambio de hora</summary><p>Los partidos se juegan principalmente sábados o domingos por la mañana. Los horarios se envían entre martes y miércoles. Cualquier aplazamiento se comunica con 48 horas de antelación; si no, partido perdido 0–3.</p></details>
+    <details><summary>Tarjetas y conducta</summary><p>Las amarillas se acumulan: 3 amarillas suponen 1 partido de suspensión. Dos amarillas en el mismo partido son expulsión. Una roja conlleva sanción según la gravedad y el equipo juega con uno menos el resto del partido. Insultos, amenazas o agresiones se sancionan con partidos o con la expulsión de la liga.</p></details>
+    <details><summary>Modalidad</summary><p>Reglas de fútbol sobre césped. Saque de banda con la mano y de portería con el pie. Sin fuera de juego. Cesión al portero: no puede coger con la mano un pase con el pie de un compañero.</p></details>
+    <details><summary>Resultados y reclamaciones</summary><p>Cada semana se envían al grupo de capitanes horarios, clasificación y estadísticas. Las reclamaciones se envían por WhatsApp privado al 621 19 17 56 en un plazo máximo de 24 horas.</p></details>
+  </div>
+</section>
+
+<div class="sponsors" id="sponsors"></div>
+<footer id="foot"></footer>
+</div></main>
+
+<script>
+const DATA = {"updated": "2026-10-15T11:00:00+02:00", "teams": [{"id": "pikito", "name": "Un Pikito FC", "delegate": "Juan Diego Simarro Herrezuelo", "goalkeeper": null, "players": [{"name": "Juan Diego Simarro Herrezuelo", "dorsal": null}, {"name": "Pablo Huertas Castillo", "dorsal": null}, {"name": "Tomás Eduardo de la Guía Angulo", "dorsal": null}, {"name": "Andrés Castellanos Cantos", "dorsal": null}, {"name": "Iván Rodríguez Alonso", "dorsal": null}, {"name": "Roberto Castillo Bielsa", "dorsal": null}, {"name": "Jesús Raboso Sánchez", "dorsal": null}, {"name": "Gabriel Iszlai", "dorsal": null}, {"name": "Ramón Arriscado Martín", "dorsal": null}, {"name": "Yordi", "dorsal": null}]}, {"id": "farandula", "name": "Disco Farándula Tomelloso", "delegate": "Óscar Camacho", "goalkeeper": null, "players": [{"name": "Óscar Camacho", "dorsal": null}, {"name": "Carlos Magro", "dorsal": null}, {"name": "Santiago Pérez", "dorsal": null}, {"name": "Kevin Salazar", "dorsal": null}, {"name": "Roberto Solano", "dorsal": null}, {"name": "Yaider Rivera", "dorsal": null}, {"name": "Yadir Rivera", "dorsal": null}, {"name": "Sebastián Vergara", "dorsal": null}, {"name": "Luis Lenis", "dorsal": null}, {"name": "Héctor", "dorsal": null}, {"name": "Ángel", "dorsal": null}]}, {"id": "getovenes", "name": "Los Getovenes FC", "delegate": "Ignacio López Ballesteros", "goalkeeper": null, "players": [{"name": "Víctor López Ramírez", "dorsal": null}, {"name": "Mario Rodríguez Moratalla", "dorsal": null}, {"name": "Antonio Jesús Sales Jiménez Ortiz", "dorsal": null}, {"name": "Adrián Serrano Núñez", "dorsal": null}, {"name": "Lorenzo Campo Castillo", "dorsal": null}, {"name": "Jorge Rodríguez Ferraz", "dorsal": null}, {"name": "Jesús Callejas García Arias", "dorsal": null}, {"name": "Héctor Martín Toledano", "dorsal": null}, {"name": "Javier Sánchez Mateos Lucas Torres", "dorsal": null}, {"name": "Gonzalo Bustamante Pérez", "dorsal": null}, {"name": "Dorel Cimpoies", "dorsal": null}, {"name": "Ignacio López Ballesteros", "dorsal": null}]}, {"id": "criptana", "name": "Grupo Criptana", "delegate": "Carlos Pinar", "goalkeeper": null, "players": [{"name": "Daniel Muñoz Ojicos de la Fuente", "dorsal": null}, {"name": "José Manuel de la Guía", "dorsal": null}, {"name": "Manuel Amores Violero", "dorsal": null}, {"name": "Antonio Creta", "dorsal": null}, {"name": "Antonio Flores", "dorsal": null}, {"name": "Jonathan Iniesta Izquierdo", "dorsal": null}, {"name": "Christian Iniesta Izquierdo", "dorsal": null}, {"name": "Ángel José Manzaneque Amores", "dorsal": null}, {"name": "Manuel Vela Angulo", "dorsal": null}, {"name": "Jesús Francisco Pintor Ucendo", "dorsal": null}, {"name": "Víctor Cogollo Ureña", "dorsal": null}, {"name": "Diego Ortega Calderón", "dorsal": null}]}, {"id": "aljafer", "name": "Aljafer", "delegate": "Moha Morradi", "goalkeeper": null, "players": [{"name": "Fernando Horta", "dorsal": null}, {"name": "Carlos Horta", "dorsal": null}, {"name": "Pablo Rodríguez", "dorsal": null}, {"name": "Arturo Lucerón", "dorsal": null}, {"name": "Isidoro Alarcos", "dorsal": null}, {"name": "Enrique Calonge", "dorsal": null}, {"name": "Rodrigo Exojo", "dorsal": null}, {"name": "José Antonio Escribano", "dorsal": null}, {"name": "Adnan Morradi", "dorsal": null}, {"name": "Fernando Izquierdo", "dorsal": null}, {"name": "Álex Gómez", "dorsal": null}, {"name": "Sergio Sánchez", "dorsal": null}]}, {"id": "jaquemate", "name": "Jaque Mate", "delegate": "Johan Escobar", "goalkeeper": null, "players": [{"name": "Ronald Chaux", "dorsal": null}, {"name": "Kevin Arboleda", "dorsal": null}, {"name": "Stiven Millán", "dorsal": null}, {"name": "Kevin Castillo", "dorsal": null}, {"name": "Daniel Castrillón", "dorsal": null}, {"name": "Juan Ordóñez", "dorsal": null}, {"name": "Edgar Hernández", "dorsal": null}, {"name": "Miguel Martínez", "dorsal": null}, {"name": "Gherman Chango", "dorsal": null}, {"name": "Álvaro Costa", "dorsal": null}, {"name": "Randhall Aguilar", "dorsal": null}]}, {"id": "tercio", "name": "Ponme un tercio, calvo", "delegate": null, "goalkeeper": null, "players": []}], "jornadas": [{"n": 1, "date": null, "rest": "pikito", "matches": [{"home": "jaquemate", "away": "tercio", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "criptana", "away": "aljafer", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "farandula", "away": "getovenes", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 2, "date": null, "rest": "aljafer", "matches": [{"home": "jaquemate", "away": "pikito", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "tercio", "away": "getovenes", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "criptana", "away": "farandula", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 3, "date": null, "rest": "farandula", "matches": [{"home": "aljafer", "away": "pikito", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "getovenes", "away": "jaquemate", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "tercio", "away": "criptana", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 4, "date": null, "rest": "tercio", "matches": [{"home": "getovenes", "away": "pikito", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "farandula", "away": "aljafer", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "jaquemate", "away": "criptana", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 5, "date": null, "rest": "jaquemate", "matches": [{"home": "pikito", "away": "farandula", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "criptana", "away": "getovenes", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "aljafer", "away": "tercio", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 6, "date": null, "rest": "getovenes", "matches": [{"home": "pikito", "away": "criptana", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "tercio", "away": "farandula", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "aljafer", "away": "jaquemate", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 7, "date": null, "rest": "criptana", "matches": [{"home": "pikito", "away": "tercio", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "farandula", "away": "jaquemate", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "getovenes", "away": "aljafer", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 8, "date": null, "rest": "pikito", "matches": [{"home": "tercio", "away": "jaquemate", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "aljafer", "away": "criptana", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "getovenes", "away": "farandula", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 9, "date": null, "rest": "aljafer", "matches": [{"home": "pikito", "away": "jaquemate", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "getovenes", "away": "tercio", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "farandula", "away": "criptana", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 10, "date": null, "rest": "farandula", "matches": [{"home": "pikito", "away": "aljafer", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "jaquemate", "away": "getovenes", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "criptana", "away": "tercio", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 11, "date": null, "rest": "tercio", "matches": [{"home": "pikito", "away": "getovenes", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "aljafer", "away": "farandula", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "criptana", "away": "jaquemate", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 12, "date": null, "rest": "jaquemate", "matches": [{"home": "farandula", "away": "pikito", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "getovenes", "away": "criptana", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "tercio", "away": "aljafer", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 13, "date": null, "rest": "getovenes", "matches": [{"home": "criptana", "away": "pikito", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "farandula", "away": "tercio", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "jaquemate", "away": "aljafer", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 14, "date": null, "rest": "criptana", "matches": [{"home": "tercio", "away": "pikito", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "jaquemate", "away": "farandula", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "aljafer", "away": "getovenes", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 15, "date": null, "rest": "farandula", "matches": [{"home": "aljafer", "away": "pikito", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "getovenes", "away": "jaquemate", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "tercio", "away": "criptana", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 16, "date": null, "rest": "tercio", "matches": [{"home": "getovenes", "away": "pikito", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "farandula", "away": "aljafer", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "jaquemate", "away": "criptana", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 17, "date": null, "rest": "jaquemate", "matches": [{"home": "pikito", "away": "farandula", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "criptana", "away": "getovenes", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "aljafer", "away": "tercio", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 18, "date": null, "rest": "getovenes", "matches": [{"home": "pikito", "away": "criptana", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "tercio", "away": "farandula", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "aljafer", "away": "jaquemate", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 19, "date": null, "rest": "criptana", "matches": [{"home": "pikito", "away": "tercio", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "farandula", "away": "jaquemate", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "getovenes", "away": "aljafer", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 20, "date": null, "rest": "pikito", "matches": [{"home": "jaquemate", "away": "tercio", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "criptana", "away": "aljafer", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "farandula", "away": "getovenes", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}, {"n": 21, "date": null, "rest": "aljafer", "matches": [{"home": "jaquemate", "away": "pikito", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "tercio", "away": "getovenes", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}, {"home": "criptana", "away": "farandula", "time": null, "hs": null, "as": null, "goals": [], "cards": [], "note": null, "pista": null, "reportedAt": null, "status": null}], "mvp": null, "cronica": null}], "puskas": [], "sanctions": [], "playoffs": {"semis": [null, null], "final": null}, "ofertas": [], "aficion": {"winner": null}, "avisos": [], "sponsors": [{"name": "Deporte VIP", "tier": "main", "text": "Patrocinador de las camisetas"}], "showSponsors": false};
+
+const T = Object.fromEntries(DATA.teams.map(t=>[t.id,t]));
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const played = m => m.hs!=null && m.as!=null;
+const allMatches = DATA.jornadas.flatMap(j=>j.matches.map(m=>({...m,j:j.n,date:j.date})));
+const playedMatches = allMatches.filter(played);
+const postponed = m => !played(m) && m.status==="aplazado";
+let MY=null; try{MY=localStorage.getItem("myteam")||null}catch(e){} if(MY&&!T[MY]) MY=null;
+const mine = id => MY && id===MY ? " mine" : "";
+let FICHA=null;
+const teamBtn = id => `<button class="linkbtn" data-team="${id}">${esc(T[id].name)}</button>`;
+const NOW = Date.now();
+const H24 = 24*3600*1000;
+function status(m){ if(!played(m)) return null; if(m.reportedAt){const t=new Date(m.reportedAt).getTime(); if(NOW < t+H24) return {prov:true, until:new Date(t+H24)};} return {prov:false}; }
+const fmtWhen = d => d.toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"})+" "+d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+const stHTML = m => { const s=status(m); if(!s) return ""; return s.prov ? `<span class="st prov" title="Se puede reclamar hasta ${esc(fmtWhen(s.until))}">Provisional hasta ${esc(fmtWhen(s.until))}</span>` : `<span class="st ofi">Oficial</span>`; };
+const fmtDate = d => { if(!d) return "Fecha por confirmar"; const x=new Date(d+"T12:00:00"); return x.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}); };
+
+function table(){
+  const s={}; DATA.teams.forEach(t=>s[t.id]={id:t.id,pj:0,g:0,e:0,p:0,gf:0,gc:0,pts:0,form:[]});
+  playedMatches.forEach(m=>{
+    const h=s[m.home],a=s[m.away];
+    h.pj++;a.pj++;h.gf+=m.hs;h.gc+=m.as;a.gf+=m.as;a.gc+=m.hs;
+    if(m.hs>m.as){h.g++;a.p++;h.pts+=3;h.form.push("W");a.form.push("L")}
+    else if(m.hs<m.as){a.g++;h.p++;a.pts+=3;h.form.push("L");a.form.push("W")}
+    else{h.e++;a.e++;h.pts++;a.pts++;h.form.push("D");a.form.push("D")}
+  });
+  const rows=Object.values(s); rows.forEach(r=>r.dg=r.gf-r.gc);
+  const h2h=(group)=>{const ids=new Set(group.map(r=>r.id));const x={};group.forEach(r=>x[r.id]={pts:0,dg:0});
+    playedMatches.filter(m=>ids.has(m.home)&&ids.has(m.away)).forEach(m=>{
+      x[m.home].dg+=m.hs-m.as;x[m.away].dg+=m.as-m.hs;
+      if(m.hs>m.as)x[m.home].pts+=3;else if(m.hs<m.as)x[m.away].pts+=3;else{x[m.home].pts++;x[m.away].pts++}});return x;};
+  rows.sort((a,b)=>b.pts-a.pts);
+  const out=[];let i=0;
+  while(i<rows.length){let j=i;while(j<rows.length&&rows[j].pts===rows[i].pts)j++;
+    const g=rows.slice(i,j);
+    if(g.length>1){const x=h2h(g);g.sort((a,b)=>x[b.id].pts-x[a.id].pts||x[b.id].dg-x[a.id].dg||b.dg-a.dg||b.gf-a.gf||T[a.id].name.localeCompare(T[b.id].name,"es"))}
+    out.push(...g);i=j;}
+  return out;
+}
+
+function renderTable(){
+  const rows=table(); const anyPlayed=playedMatches.length>0;
+  document.getElementById("cl-sub").textContent = anyPlayed ? `Tras la jornada ${Math.max(...playedMatches.map(m=>m.j))}` : "La liga aún no ha empezado";
+  let h=`<thead><tr><th>#</th><th class="l">Equipo</th><th>Pts</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th class="hide-sm">GF</th><th class="hide-sm">GC</th><th>DG</th><th class="hide-sm">Últimos</th></tr></thead><tbody>`;
+  rows.forEach((r,i)=>{
+    const prize = i<4 ? '<span class="prize g">Play-off</span>' : '';
+    const form = r.form.length ? `<span class="form">${r.form.slice(-5).map(f=>`<i class="${f}">${{W:"G",D:"E",L:"P"}[f]}</i>`).join("")}</span>` : '<span class="form"><span class="none">–</span></span>';
+    const apl=allMatches.some(m=>postponed(m)&&(m.home===r.id||m.away===r.id));
+    h+=`<tr class="p${i+1}${i===3?" cut":""}${mine(r.id)}"><td class="pos">${i+1}</td><td class="l team">${teamBtn(r.id)}${apl?' <span title="Tiene un partido aplazado" style="color:var(--yellow)">*</span>':''}${prize}</td><td class="pts">${r.pts}</td><td>${r.pj}</td><td>${r.g}</td><td>${r.e}</td><td>${r.p}</td><td class="hide-sm">${r.gf}</td><td class="hide-sm">${r.gc}</td><td>${r.dg>0?"+":""}${r.dg}</td><td class="hide-sm">${form}</td></tr>`;
+  });
+  document.getElementById("tbl").innerHTML=h+"</tbody>";
+}
+
+let curJ = (()=>{const p=DATA.jornadas.filter(j=>j.matches.some(played));const next=DATA.jornadas.find(j=>j.matches.some(m=>!played(m)&&!postponed(m)));return next?next.n:(p.length?p[p.length-1].n:1)})();
+function renderJ(){
+  document.getElementById("jsel").innerHTML = DATA.jornadas.map(j=>`<button class="jbtn ${j.matches.every(played)?"done":""}" aria-pressed="${j.n===curJ}" data-j="${j.n}" aria-label="Jornada ${j.n}">${j.n}</button>`).join("");
+  const j=DATA.jornadas.find(x=>x.n===curJ);
+  let h=`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:4px"><h3>Jornada ${j.n} · Vuelta ${Math.ceil(j.n/7)}</h3><span class="chip">${esc(fmtDate(j.date))}</span></div>`;
+  if(j.cronica) h+=`<p class="cronica">${esc(j.cronica)}</p>`;
+  j.matches.forEach(m=>{
+    const p=played(m);
+    h+=`<div class="match${mine(m.home)||mine(m.away)}"><div class="t h">${esc(T[m.home].name)}</div><div class="score ${p?"":"pend"}">${p?`${m.hs} – ${m.as}${stHTML(m)}`:postponed(m)?`Aplazado<span class="st apl">${m.newDate?esc(fmtDate(m.newDate))+(m.newTime?" · "+esc(m.newTime):""):"Nueva fecha por confirmar"}</span>`:(m.time?esc(m.time):"vs")}${!p&&!postponed(m)&&m.pista?`<span class="st ofi">${esc(m.pista)}</span>`:""}</div><div class="t">${esc(T[m.away].name)}</div>`;
+    if(p && (m.goals.length||m.cards.length||m.note)){
+      const side=(tid)=>{
+        const g={};m.goals.filter(x=>x.team===tid&&!x.og).forEach(x=>g[x.player]=(g[x.player]||0)+1);
+        const og=m.goals.filter(x=>x.team!==tid&&x.og).map(x=>`${esc(x.player)} (p.p.)`);
+        const goals=Object.entries(g).map(([n,c])=>`⚽ ${esc(n)}${c>1?` ×${c}`:""}`).concat(og.map(x=>"⚽ "+x));
+        const as={};m.goals.filter(x=>x.team===tid&&x.assist).forEach(x=>as[x.assist]=(as[x.assist]||0)+1);
+        const asl=Object.entries(as).map(([n,c])=>`🅰️ ${esc(n)}${c>1?` ×${c}`:""}`);
+        const cards=m.cards.filter(x=>x.team===tid).map(x=>x.type==="YY"?`<span class="card-y"></span><span class="card-r"></span>${esc(x.player)}`:`<span class="card-${x.type==="R"?"r":"y"}"></span>${esc(x.player)}`);
+        return goals.concat(asl,cards).join("<br>");
+      };
+      h+=`<div class="mdetail"><div class="h">${side(m.home)}</div><div>${side(m.away)}</div>${m.note?`<div class="full">${esc(m.note)}</div>`:""}</div>`;
+    }
+    h+=`</div>`;
+  });
+  if(j.mvp) h+=`<div class="jmvp">MVP de la jornada: <b>${esc(j.mvp.player)}</b> · ${esc(T[j.mvp.team]?.name||"")}</div>`;
+  if(j.rest) h+=`<div class="rest">Descansa: <b>${esc(T[j.rest].name)}</b></div>`;
+  document.getElementById("jview").innerHTML=h;
+}
+document.getElementById("jsel").addEventListener("click",e=>{const b=e.target.closest("[data-j]");if(!b)return;curJ=+b.dataset.j;renderJ();});
+
+function renderPichichi(){
+  const c={};playedMatches.forEach(m=>m.goals.filter(g=>!g.og).forEach(g=>{const k=g.team+"|"+g.player;c[k]=(c[k]||0)+1}));
+  const rows=Object.entries(c).map(([k,n])=>{const[t,p]=k.split("|");return{t,p,n}}).sort((a,b)=>b.n-a.n||a.p.localeCompare(b.p,"es"));
+  const el=document.getElementById("tpich");
+  if(!rows.length){el.innerHTML=`<tbody><tr><td class="empty">Aquí aparecerán los goleadores en cuanto se juegue la primera jornada.</td></tr></tbody>`;return;}
+  let pos=0,last=null;
+  el.innerHTML=`<thead><tr><th>#</th><th class="l">Jugador</th><th class="l">Equipo</th><th>Goles</th></tr></thead><tbody>`+rows.map((r,i)=>{if(r.n!==last){pos=i+1;last=r.n}return`<tr class="p${pos}${mine(r.t)}"><td class="pos">${pos}</td><td class="l team">${esc(r.p)}</td><td class="l" style="color:var(--muted)">${esc(T[r.t].name)}</td><td class="pts">${r.n}</td></tr>`}).join("")+"</tbody>";
+}
+
+function renderAsis(){
+  const c={};playedMatches.forEach(m=>m.goals.filter(g=>g.assist).forEach(g=>{const k=g.team+"|"+g.assist;c[k]=(c[k]||0)+1}));
+  const rows=Object.entries(c).map(([k,n])=>{const[t,p]=k.split("|");return{t,p,n}}).sort((a,b)=>b.n-a.n||a.p.localeCompare(b.p,"es"));
+  const el=document.getElementById("tasis");
+  if(!rows.length){el.innerHTML=`<tbody><tr><td class="empty">Aquí aparecerán los asistentes cuando se registren las primeras asistencias.</td></tr></tbody>`;return;}
+  let pos=0,last=null;
+  el.innerHTML=`<thead><tr><th>#</th><th class="l">Jugador</th><th class="l">Equipo</th><th>Asist.</th></tr></thead><tbody>`+rows.map((r,i)=>{if(r.n!==last){pos=i+1;last=r.n}return`<tr class="p${pos}${mine(r.t)}"><td class="pos">${pos}</td><td class="l team">${esc(r.p)}</td><td class="l" style="color:var(--muted)">${esc(T[r.t].name)}</td><td class="pts">${r.n}</td></tr>`}).join("")+"</tbody>";
+}
+
+function renderZamora(){
+  const s={};DATA.teams.forEach(t=>s[t.id]={pj:0,gc:0,cs:0});
+  playedMatches.forEach(m=>{s[m.home].pj++;s[m.away].pj++;s[m.home].gc+=m.as;s[m.away].gc+=m.hs;if(m.as===0)s[m.home].cs++;if(m.hs===0)s[m.away].cs++;});
+  const rows=DATA.teams.map(t=>({t,...s[t.id],avg:s[t.id].pj?s[t.id].gc/s[t.id].pj:null})).sort((a,b)=>(a.avg??99)-(b.avg??99)||b.pj-a.pj);
+  document.getElementById("tzam").innerHTML=`<thead><tr><th>#</th><th class="l">Portero</th><th class="l">Equipo</th><th>PJ</th><th>GC</th><th>Media</th><th class="hide-sm">Imbatido</th></tr></thead><tbody>`+
+    rows.map((r,i)=>`<tr class="p${r.pj?i+1:0}${mine(r.t.id)}"><td class="pos">${i+1}</td><td class="l team">${r.t.goalkeeper?esc(r.t.goalkeeper):'<span style="color:var(--muted);font-weight:400">Por designar</span>'}</td><td class="l" style="color:var(--muted)">${esc(r.t.name)}</td><td>${r.pj}</td><td>${r.gc}</td><td class="pts">${r.avg==null?"–":r.avg.toFixed(2).replace(".",",")}</td><td class="hide-sm">${r.cs}</td></tr>`).join("")+"</tbody>";
+}
+
+const CARD_LABEL={Y:"Amarilla",YY:"Doble amarilla",R:"Roja directa"};
+function teamJs(team){ return DATA.jornadas.filter(j=>j.matches.some(m=>m.home===team||m.away===team)); }
+function teamMatchIn(j,team){ return j.matches.find(m=>m.home===team||m.away===team); }
+function suspensions(){
+  const out=[]; const ycount={};
+  DATA.jornadas.forEach(j=>j.matches.filter(played).forEach(m=>(m.cards||[]).forEach(x=>{
+    const k=x.team+"|"+x.player;
+    if(x.type==="Y"){ ycount[k]=(ycount[k]||0)+1; if(ycount[k]%3===0) out.push({kind:"Y",player:x.player,team:x.team,j:j.n,games:1,reason:`${ycount[k]}.ª amarilla (ciclo ${ycount[k]/3})`}); }
+    else if(x.type==="YY"||x.type==="R"){ out.push({kind:"R",type:x.type,player:x.player,team:x.team,j:j.n,games:x.games!=null?x.games:(x.type==="YY"?1:null),reason:x.reason||(x.type==="YY"?"Dos amarillas en el mismo partido":"")}); }
+  })));
+  (DATA.sanctions||[]).forEach(z=>out.push({kind:"M",player:z.player,team:z.team,j:z.fromJ||0,games:z.games,reason:z.reason||""}));
+  out.forEach(z=>{
+    if(z.games==null){ z.state="decidir"; return; }
+    const serve=teamJs(z.team).filter(j=>j.n>z.j).slice(0,z.games);
+    z.serve=serve.map(j=>j.n);
+    const pend=serve.find(j=>!played(teamMatchIn(j,z.team)));
+    z.pendingJ=pend?pend.n:null;
+    z.state=(serve.length<z.games && !pend)?"pendiente":(pend?"pendiente":"cumplida");
+    if(serve.length<z.games && !pend) z.pendingJ=null;
+  });
+  return out;
+}
+const susText=z=> z.state==="decidir" ? `<span class="chip warn">Sanción por decidir</span>`
+  : z.state==="cumplida" ? `<span class="chip">Cumplida${z.serve.length?` · J${z.serve.join(", J")}`:""}</span>`
+  : `<span class="chip bad">No juega${z.pendingJ?` la J${z.pendingJ}`:""}${z.games>1?` · ${z.games} partidos (J${z.serve.join(", J")})`:""}</span>`;
+
+function renderCards(){
+  const S=suspensions();
+  // yellow accumulation table
+  const y={}; DATA.jornadas.forEach(j=>j.matches.filter(played).forEach(m=>(m.cards||[]).filter(x=>x.type==="Y").forEach(x=>{const k=x.team+"|"+x.player;(y[k]=y[k]||{t:x.team,p:x.player,n:0,js:[]}).n++;y[k].js.push(j.n);})));
+  const yr=Object.values(y).sort((a,b)=>b.n-a.n||a.p.localeCompare(b.p,"es"));
+  document.getElementById("tyellow").innerHTML = yr.length ? `<thead><tr><th class="l">Jugador</th><th class="l">Equipo</th><th>Total</th><th>Ciclo</th><th class="l">Jornadas</th><th class="l">Estado</th></tr></thead><tbody>`+yr.map(r=>{
+      const cyc=r.n%3; const mys=S.filter(z=>z.kind==="Y"&&z.player===r.p&&z.team===r.t); const act=mys.find(z=>z.state==="pendiente");
+      const st = act ? susText(act) : cyc===2 ? '<span class="chip warn">A una amarilla de sanción</span>' : mys.length ? susText(mys[mys.length-1]) : '';
+      return `<tr class="${mine(r.t)}"><td class="l team wrapc">${esc(r.p)}</td><td class="l wrapc" style="color:var(--muted)">${esc(T[r.t].name)}</td><td class="pts" style="color:var(--yellow)">${r.n}</td><td><span class="cyc" aria-label="${cyc} de 3">${[0,1,2].map(i=>`<i class="${i<cyc?"on":""}"></i>`).join("")}</span></td><td class="l" style="color:var(--muted)">J${r.js.join(", J")}</td><td class="l">${st}</td></tr>`}).join("")+"</tbody>"
+    : `<tbody><tr><td class="empty">Sin amarillas por ahora.</td></tr></tbody>`;
+  // red cards table
+  const reds=S.filter(z=>z.kind==="R"||z.kind==="M").sort((a,b)=>b.j-a.j);
+  document.getElementById("tred").innerHTML = reds.length ? `<thead><tr><th>J</th><th class="l">Jugador</th><th class="l">Equipo</th><th class="l">Tipo</th><th class="l">Motivo</th><th>Sanción</th><th class="l">Estado</th></tr></thead><tbody>`+reds.map(z=>`<tr class="${mine(z.team)}"><td class="pos" style="font-size:16px">${z.j||"–"}</td><td class="l team wrapc">${esc(z.player)}</td><td class="l wrapc" style="color:var(--muted)">${esc(T[z.team].name)}</td><td class="l"><span class="card-r"></span>${z.kind==="M"?"Sanción del comité":CARD_LABEL[z.type]}</td><td class="l wrapc" style="color:var(--muted)">${esc(z.reason||"–")}</td><td>${z.games==null?"–":`${z.games} ${z.games==1?"partido":"partidos"}`}</td><td class="l">${susText(z)}</td></tr>`).join("")+"</tbody>"
+    : `<tbody><tr><td class="empty">Sin tarjetas rojas por ahora.</td></tr></tbody>`;
+  // fair play
+  const fp={};DATA.teams.forEach(t=>fp[t.id]={y:0,yy:0,r:0});
+  playedMatches.forEach(m=>(m.cards||[]).forEach(x=>{const f=fp[x.team];if(!f)return;x.type==="Y"?f.y++:x.type==="YY"?f.yy++:f.r++;}));
+  const fr=DATA.teams.map(t=>({id:t.id,...fp[t.id],pts:fp[t.id].y+fp[t.id].yy*3+fp[t.id].r*4})).sort((a,b)=>a.pts-b.pts||T[a.id].name.localeCompare(T[b.id].name,"es"));
+  document.getElementById("tfair").innerHTML=`<thead><tr><th>#</th><th class="l">Equipo</th><th>Amarillas</th><th>Dobles</th><th>Rojas</th><th>Puntos</th></tr></thead><tbody>`+fr.map((r,i)=>`<tr class="${mine(r.id)}"><td class="pos" style="font-size:16px">${i+1}</td><td class="l team">${esc(T[r.id].name)}</td><td>${r.y}</td><td>${r.yy}</td><td>${r.r}</td><td class="pts">${r.pts}</td></tr>`).join("")+"</tbody>";
+  // suspended now
+  const act=S.filter(z=>z.state!=="cumplida");
+  document.getElementById("sanc").innerHTML = `<h3 style="margin-bottom:8px">Sancionados ahora</h3>` + (act.length ? act.map(z=>`<div style="padding:6px 0;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center">${susText(z)} <b>${esc(z.player)}</b> <span style="color:var(--muted)">· ${esc(T[z.team].name)} · ${z.kind==="Y"?"Acumulación de amarillas":z.kind==="M"?esc(z.reason):CARD_LABEL[z.type]}</span></div>`).join("") : `<div style="color:var(--muted)">Nadie está sancionado ahora mismo.</div>`);
+}
+
+function renderTeams(){
+  if(!FICHA) FICHA=MY||DATA.teams[0].id;
+  document.getElementById("tchips").innerHTML=DATA.teams.map(t=>`<button class="tchip" aria-pressed="${t.id===FICHA}" data-ficha="${t.id}">${esc(t.name)}</button>`).join("");
+  const id=FICHA, t=T[id]; const rows=table(); const pos=rows.findIndex(r=>r.id===id); const r=rows[pos];
+  const cal=DATA.jornadas.map(j=>{ const m=teamMatchIn(j,id);
+    if(!m) return `<div class="r"><span class="j">J${j.n}</span><span style="color:var(--muted)">Descansa</span><span></span></div>`;
+    const home=m.home===id, riv=home?m.away:m.home;
+    let res=`<span class="chip">${postponed(m)?"Aplazado":esc(m.time||(j.date?fmtDate(j.date):"Por confirmar"))}</span>`;
+    if(played(m)){ const gf=home?m.hs:m.as, gc=home?m.as:m.hs; const k=gf>gc?"W":gf<gc?"L":"D"; res=`<span class="res ${k}">${gf}–${gc}</span>`; }
+    return `<div class="r"><span class="j">J${j.n}</span><span style="min-width:0">${home?"vs":"en"} ${esc(T[riv].name)}</span>${res}</div>`; }).join("");
+  const g={}; playedMatches.forEach(m=>m.goals.filter(x=>x.team===id&&!x.og).forEach(x=>g[x.player]=(g[x.player]||0)+1));
+  const gl=Object.entries(g).sort((a,b)=>b[1]-a[1]);
+  const h2h=DATA.teams.filter(o=>o.id!==id).map(o=>{ const x={pj:0,g:0,e:0,p:0,gf:0,gc:0};
+    playedMatches.filter(m=>(m.home===id&&m.away===o.id)||(m.home===o.id&&m.away===id)).forEach(m=>{const home=m.home===id;const a=home?m.hs:m.as,b=home?m.as:m.hs;x.pj++;x.gf+=a;x.gc+=b;a>b?x.g++:a<b?x.p++:x.e++;});
+    return `<tr><td class="l team">${esc(o.name)}</td><td>${x.pj}</td><td>${x.g}</td><td>${x.e}</td><td>${x.p}</td><td>${x.gf}–${x.gc}</td></tr>`; }).join("");
+  const S=suspensions().filter(z=>z.team===id&&z.state!=="cumplida");
+  document.getElementById("ficha").innerHTML=`
+    <div class="panel"><div class="big">${esc(t.name)}</div><div style="color:var(--muted)">${t.delegate?`Delegado: ${esc(t.delegate)}`:"Delegado por confirmar"}${t.goalkeeper?` · Portero: ${esc(t.goalkeeper)}`:""}</div>
+      <div class="myteam" style="border:0"><div class="row"><div><div class="k">Posición</div><div class="v">${pos+1}.º</div></div><div><div class="k">Puntos</div><div class="v">${r.pts}</div></div><div><div class="k">Balance</div><div class="v">${r.g}G · ${r.e}E · ${r.p}P</div></div><div><div class="k">Goles</div><div class="v">${r.gf} a favor · ${r.gc} en contra</div></div><div><div class="k">Sancionados</div><div class="v">${S.length?S.map(z=>esc(z.player)).join(", "):"Ninguno"}</div></div></div></div></div>
+    <div class="grid2">
+      <div class="panel"><h3 style="margin-bottom:6px">Calendario</h3><div class="cal">${cal}</div></div>
+      <div class="stack">
+        <div class="panel"><h3 style="margin-bottom:6px">Goleadores</h3>${gl.length?gl.map(([n,c])=>`<div style="display:flex;justify-content:space-between;padding:4px 0"><span>${esc(n)}</span><b>${c}</b></div>`).join(""):`<div style="color:var(--muted)">Sin goles todavía.</div>`}</div>
+        <div class="panel scroll"><h3 style="margin-bottom:6px">Contra cada rival</h3><table><thead><tr><th class="l">Rival</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>Goles</th></tr></thead><tbody>${h2h}</tbody></table></div>
+        <div class="panel teamcard"><h3 style="margin-bottom:6px">Plantilla</h3>${t.players.length?`<ol>${t.players.map(p=>`<li>${esc(p.name)}${p.dorsal!=null?` <span class="chip">#${p.dorsal}</span>`:""}</li>`).join("")}</ol>`:`<p style="color:var(--muted);margin:0">Plantilla pendiente de recibir.</p>`}</div>
+      </div>
+    </div>`;
+}
+
+function renderAwards(){
+  const rows=table(); const any=playedMatches.length>0;
+  const pich=(()=>{const c={};playedMatches.forEach(m=>m.goals.filter(g=>!g.og).forEach(g=>c[g.player]=(c[g.player]||0)+1));const e=Object.entries(c).sort((a,b)=>b[1]-a[1]);return e.length?`${e[0][0]} · ${e[0][1]} goles`:null})();
+  const mvp=(()=>{const e=mvpRank();return e.length?`${e[0].player} · ${e[0].n} ${e[0].n===1?"vez":"veces"} MVP de jornada`:null})();
+  const items=[
+    ["Campeón","Ganador de la final de play-offs. Trofeo + inscripción gratuita a la siguiente liga (valor 350 €) o 280 € en metálico.", finalRes().champ?T[finalRes().champ].name:null],
+    ["Subcampeón","Perdedor de la final de play-offs. Trofeo + 50 % de descuento en la siguiente liga (175 €) o 140 € en metálico.", finalRes().runner?T[finalRes().runner].name:null],
+    ["Pichichi","Trofeo al máximo goleador de la liga.", pich],
+    ["MVP","Trofeo. Se valoran goles, asistencias, compañerismo, regularidad, deportividad y respeto durante toda la temporada.", mvp],
+    ["Puskás","Trofeo al mejor gol de la liga.", (()=>{const w=DATA.puskas.find(g=>g.winner);return w?`${w.player} (${T[w.team]?.name||""})`:(DATA.puskas.length?`${DATA.puskas.length} goles nominados`:null)})()],
+    ["Zamora","Trofeo al portero menos goleado.", null],
+    ["Mejor afición","Los equipos votan a la mejor afición, que recibe un obsequio.", DATA.aficion?.winner?T[DATA.aficion.winner]?.name:null],
+  ];
+  document.getElementById("awards").innerHTML=items.map(([n,d,l])=>`<div class="panel award"><h4>${n}</h4><p>${d}</p>${l?`<p class="lead">Ahora: ${esc(l)}</p>`:""}</div>`).join("");
+}
+
+function nextJ(){ return DATA.jornadas.find(j=>j.matches.some(m=>!played(m)&&!postponed(m))); }
+function lastJ(){ const p=DATA.jornadas.filter(j=>j.matches.some(played)); return p[p.length-1]; }
+
+function renderAvisos(){
+  const a=(DATA.avisos||[]).filter(x=>x.active!==false).sort((x,y)=>String(y.date||"").localeCompare(String(x.date||"")));
+  document.getElementById("avisos").innerHTML=a.map(x=>`<div class="panel notice${x.type==="alert"?" alert":""}">${x.date?`<div class="d">${esc(fmtDate(x.date))}</div>`:""}<h4>${esc(x.title)}</h4>${x.text?`<p>${esc(x.text)}</p>`:""}</div>`).join("");
+}
+function renderMine(){
+  const el=document.getElementById("pxmine"); if(!MY){el.hidden=true;return;} el.hidden=false;
+  const rows=table(); const pos=rows.findIndex(r=>r.id===MY); const r=rows[pos];
+  const nj=nextJ(); let nxt="Liga regular terminada";
+  if(nj){ const m=teamMatchIn(nj,MY); if(!m) nxt=`Descansa en la jornada ${nj.n}`; else { const home=m.home===MY; const riv=T[home?m.away:m.home].name; nxt=`J${nj.n} · ${home?"en casa":"fuera"} contra ${riv}${m.time?` · ${m.time}`:""}${nj.date?` · ${fmtDate(nj.date)}`:""}`; } }
+  const sus=suspensions().filter(z=>z.team===MY&&z.state!=="cumplida");
+  el.innerHTML=`<h3>Mi equipo</h3><div class="big" style="font-size:28px">${esc(T[MY].name)}</div>
+    <div class="row"><div><div class="k">Posición</div><div class="v">${pos+1}.º · ${r.pts} pts</div></div><div><div class="k">Próximo partido</div><div class="v">${esc(nxt)}</div></div><div><div class="k">Sancionados</div><div class="v">${sus.length?sus.map(z=>esc(z.player)).join(", "):"Ninguno"}</div></div></div>`;
+}
+function renderProxima(){
+  const j=nextJ(); const sub=document.getElementById("px-sub");
+  if(!j){ sub.textContent="Liga regular terminada"; document.getElementById("pxview").innerHTML=`<div class="empty">La fase regular ha terminado. Mira la pestaña Play-offs.</div>`; }
+  else{
+    sub.textContent=`Jornada ${j.n} · Vuelta ${Math.ceil(j.n/7)}`;
+    let h=`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline"><div class="big">${esc(fmtDate(j.date))}</div>${j.date?"":`<span class="chip">Horarios entre martes y miércoles</span>`}</div>`;
+    j.matches.forEach(m=>{ const p=played(m);
+      h+=`<div class="match${mine(m.home)||mine(m.away)}"><div class="t h">${esc(T[m.home].name)}</div><div class="score ${p?"":"pend"}">${p?`${m.hs} – ${m.as}${stHTML(m)}`:(m.time?esc(m.time):"Hora por confirmar")}${!p&&m.pista?`<span class="st ofi">${esc(m.pista)}</span>`:""}</div><div class="t">${esc(T[m.away].name)}</div></div>`; });
+    if(j.rest) h+=`<div class="rest">Descansa: <b>${esc(T[j.rest].name)}</b></div>`;
+    h+=`<div class="legend" style="margin-top:10px"><span>Llegad al menos 10 minutos antes. Con más de 10 minutos de retraso sin causa justificada, el partido se da por perdido 0–3.</span></div>`;
+    document.getElementById("pxview").innerHTML=h;
+  }
+  const ap=allMatches.filter(postponed); const apEl=document.getElementById("pxapl");
+  apEl.hidden=!ap.length;
+  apEl.innerHTML=`<h3 style="margin-bottom:8px">Partidos aplazados pendientes</h3>`+ap.map(m=>`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid var(--line)"><span>J${m.j} · ${esc(T[m.home].name)} – ${esc(T[m.away].name)}</span><span class="chip warn">${m.newDate?esc(fmtDate(m.newDate))+(m.newTime?" · "+esc(m.newTime):""):"Nueva fecha por confirmar"}</span></div>`).join("");
+  const nj=nextJ(); const sc=suspensions().filter(z=>z.state==="decidir"||(nj&&z.pendingJ===nj.n));
+  const risk=(()=>{const c={};playedMatches.forEach(m=>m.cards.filter(x=>x.type==="Y").forEach(x=>{const k=x.team+"|"+x.player;c[k]=(c[k]||0)+1}));return Object.entries(c).filter(([k,n])=>n%3===2).map(([k])=>k.split("|"));})();
+  document.getElementById("pxsanc").innerHTML=`<h3 style="margin-bottom:8px">No pueden jugar</h3>`+(sc.length?sc.map(z=>`<div style="padding:4px 0;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center">${susText(z)} <b>${esc(z.player)}</b> <span style="color:var(--muted)">· ${esc(T[z.team].name)}</span></div>`).join(""):`<div style="color:var(--muted)">Nadie sancionado.</div>`)
+    +(risk.length?`<h3 style="margin:14px 0 8px">Con 2 amarillas</h3>`+risk.map(([t,p])=>`<div style="padding:4px 0"><span class="chip warn">Aviso</span> ${esc(p)} <span style="color:var(--muted)">· ${esc(T[t].name)}</span></div>`).join(""):"");
+  const l=lastJ();
+  document.getElementById("pxlast").innerHTML = l ? `<h3 style="margin-bottom:8px">Última jornada · J${l.n}</h3>`+l.matches.filter(played).map(m=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line)"><span style="min-width:0">${esc(T[m.home].name)} – ${esc(T[m.away].name)}</span><b style="white-space:nowrap;font-variant-numeric:tabular-nums">${m.hs}–${m.as}</b></div>`).join("")+(l.mvp?`<div class="jmvp" style="border:0;margin-top:4px">MVP: <b>${esc(l.mvp.player)}</b></div>`:"")+(l.cronica?`<p class="cronica" style="font-size:14px;color:var(--muted);margin-top:8px">${esc(l.cronica)}</p>`:"")
+    : `<h3 style="margin-bottom:8px">Última jornada</h3><div style="color:var(--muted)">Todavía no se ha jugado ninguna jornada.</div>`;
+}
+
+function pWinner(m){ if(!m||m.hs==null||m.as==null) return null; if(m.hs!==m.as) return m.hs>m.as?m.home:m.away; return m.pens?(m.pens[0]>m.pens[1]?m.home:m.away):null; }
+function finalRes(){ const F=(DATA.playoffs||{}).final; const c=pWinner(F); return {champ:c, runner:c?(c===F.home?F.away:F.home):null}; }
+function renderPlayoffs(){
+  const P=DATA.playoffs||{}; const rows=table(); const regDone=!nextJ();
+  const seedName=i=> rows[i]?T[rows[i].id].name:"—";
+  const sf=[{a:0,b:3,m:(P.semis||[])[0]},{a:1,b:2,m:(P.semis||[])[1]}];
+  const winner=m=>{ if(!m||m.hs==null) return null; if(m.hs!==m.as) return m.hs>m.as?m.home:m.away; return m.pens?(m.pens[0]>m.pens[1]?m.home:m.away):null; };
+  const slot=(seed,id,sc,win,tbd)=>`<div class="slot ${win?"win":""} ${tbd?"tbd":""}"><span class="seed">${seed}</span><span>${esc(id?T[id].name:"Por decidir")}</span><span class="sc">${sc??""}</span></div>`;
+  let h=`<div class="panel bk"><div class="lab">${regDone?"Semifinales":"Si la liga terminara hoy"}</div>`;
+  sf.forEach((s,i)=>{ const m=s.m; const ha=m?.home||(rows[s.a]?.id), aw=m?.away||(rows[s.b]?.id); const w=winner(m);
+    h+=`<div class="lab" style="margin-top:6px">Semifinal ${i+1}${m?.date?` · ${esc(fmtDate(m.date))}${m.time?` · ${esc(m.time)}`:""}`:""}</div>`+slot(s.a+1,ha,m?.hs,w&&w===ha,false)+slot(s.b+1,aw,m?.as,w&&w===aw,false)+(m?.pens?`<div class="sub" style="color:var(--muted);font-size:13px">Penaltis ${m.pens[0]}–${m.pens[1]}</div>`:"")+(m&&played(m)?stHTML(m):""); });
+  h+=`</div>`;
+  const F=P.final; const fw=winner(F);
+  const f1=F?.home||winner(sf[0].m), f2=F?.away||winner(sf[1].m);
+  h+=`<div class="panel bk final"><div class="lab">Final${F?.date?` · ${esc(fmtDate(F.date))}${F.time?` · ${esc(F.time)}`:""}`:""}</div>`+slot("",f1,F?.hs,fw&&fw===f1,!f1)+slot("",f2,F?.as,fw&&fw===f2,!f2)+(F?.pens?`<div style="color:var(--muted);font-size:13px">Penaltis ${F.pens[0]}–${F.pens[1]}</div>`:"")+(fw?`<div class="champ">Campeón: ${esc(T[fw].name)}</div><div style="text-align:center;color:var(--silver);font-weight:600">Subcampeón: ${esc(T[finalRes().runner].name)}</div>`:"")+`</div>`;
+  document.getElementById("bracket").innerHTML=h;
+}
+
+function mvpRank(){ const c={}; DATA.jornadas.forEach(j=>{ if(j.mvp){const k=j.mvp.team+"|"+j.mvp.player; c[k]=(c[k]||0)+1;} }); return Object.entries(c).map(([k,n])=>{const[t,p]=k.split("|");return{team:t,player:p,n}}).sort((a,b)=>b.n-a.n||a.player.localeCompare(b.player,"es")); }
+function renderMVP(){
+  const r=mvpRank();
+  document.getElementById("mvprank").innerHTML=`<h3 style="margin-bottom:8px">Más veces MVP</h3>`+(r.length?r.slice(0,5).map((x,i)=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)"><span><b>${esc(x.player)}</b> <span style="color:var(--muted)">· ${esc(T[x.team]?.name||"")}</span></span><b style="color:var(--lime)">${x.n}</b></div>`).join(""):`<div style="color:var(--muted)">El MVP de cada jornada aparecerá aquí en cuanto se juegue la primera.</div>`)
+    +`<div class="legend" style="margin-top:10px"><span>El trofeo MVP valora toda la temporada: goles, asistencias, compañerismo, regularidad, deportividad y respeto.</span></div>`;
+  document.getElementById("tmvp").innerHTML=`<thead><tr><th>J</th><th class="l">MVP de la jornada</th><th class="l">Equipo</th></tr></thead><tbody>`+DATA.jornadas.map(j=>`<tr class="${j.mvp?mine(j.mvp.team):""}"><td class="pos" style="font-size:16px">${j.n}</td><td class="l team">${j.mvp?esc(j.mvp.player):'<span style="color:var(--muted);font-weight:400">–</span>'}</td><td class="l" style="color:var(--muted)">${j.mvp?esc(T[j.mvp.team]?.name||""):""}</td></tr>`).join("")+"</tbody>";
+}
+
+function goalMedia(g){
+  if(g.video) return `<video controls preload="metadata" playsinline src="${esc(g.video)}"></video>`;
+  if(g.link) return `<a class="btn" href="${esc(g.link)}" target="_blank" rel="noopener">Ver el gol</a>`;
+  return `<div style="color:var(--muted);font-size:13px">Vídeo pendiente de subir.</div>`;
+}
+function renderPuskas(){
+  const w=DATA.puskas.find(g=>g.winner);
+  document.getElementById("pkwin").innerHTML = w ? `<h3>Ganador del Puskás</h3><div class="big" style="color:var(--gold)">${esc(w.player)}</div><div style="color:var(--muted);margin-bottom:10px">${esc(T[w.team]?.name||"")} · Jornada ${w.j}</div><div class="goal">${goalMedia(w)}</div>`
+    : `<h3>Cómo funciona</h3><p style="margin:6px 0 0;color:var(--muted)">Grabamos los partidos con las cámaras de la pista. Cada jornada se eligen los mejores goles y se suben aquí en vídeo. En la última jornada se elige el mejor gol de la temporada y el trofeo es para quien lo marcó.</p>`;
+  const by={}; DATA.puskas.forEach(g=>(by[g.j]=by[g.j]||[]).push(g));
+  const js=Object.keys(by).map(Number).sort((a,b)=>b-a);
+  document.getElementById("pklist").innerHTML = js.length ? js.map(n=>`<div class="panel stack"><h3>Jornada ${n}</h3><div class="grid2">${by[n].map(g=>`<div class="goal"><div><div class="who">${esc(g.player)}</div><div class="sub">${esc(T[g.team]?.name||"")}${g.note?` · ${esc(g.note)}`:""}</div></div>${goalMedia(g)}</div>`).join("")}</div></div>`).join("")
+    : `<div class="panel empty">Aquí aparecerán los vídeos de los mejores goles de cada jornada.</div>`;
+}
+
+function renderAficion(){
+  const a=DATA.aficion||{};
+  document.getElementById("afview").innerHTML = (a.winner?`<h3>Ganadora</h3><div class="big" style="color:var(--gold)">${esc(T[a.winner]?.name||a.winner)}</div>`:`<h3>Trofeo a la mejor afición</h3>`)
+    +`<p style="margin:8px 0 0;color:var(--muted)">Al final de la liga, los equipos votarán a la mejor afición, que recibirá un obsequio.</p>`;
+}
+
+function renderOfertas(){
+  const o=(DATA.ofertas||[]).filter(x=>x.active!==false);
+  document.getElementById("ofview").innerHTML = o.length ? o.map(x=>`<div class="panel offer"><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p>${x.where||x.until?`<div class="where">${esc(x.where||"")}${x.where&&x.until?" · ":""}${x.until?`Hasta el ${esc(fmtDate(x.until))}`:""}</div>`:""}</div>`).join("")
+    : `<div class="panel empty">Cada semana se publicarán aquí las ofertas del restaurante, las tiendas y las pistas para los participantes de la liga.</div>`;
+}
+
+function renderSponsors(){
+  const sp=DATA.sponsors||[]; const el=document.getElementById("sponsors");
+  if(!DATA.showSponsors){ el.hidden=true; el.innerHTML=""; return; } el.hidden=false;
+  const tile=x=>{ const inner=`<b>${esc(x.name)}</b>${x.text?`<span>${esc(x.text)}</span>`:""}`; return x.link?`<a class="sp${x.tier==="main"?" main":""}" href="${esc(x.link)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="sp${x.tier==="main"?" main":""}">${inner}</div>`; };
+  document.getElementById("sponsors").innerHTML=`<h3>Patrocinadores</h3><div class="sgrid">${sp.map(tile).join("")}<div class="sp free"><b>Tu marca aquí</b><span>¿Quieres patrocinar la liga? Habla con Complejo Altomira.</span></div></div>`;
+}
+
+function renderMeta(){
+  const total=allMatches.length, done=playedMatches.length;
+  const up=new Date(DATA.updated);
+  document.getElementById("meta").innerHTML=`<span><b>${DATA.teams.length}</b> equipos</span><span><b>${DATA.jornadas.length}</b> jornadas · 3 vueltas</span><span><b>${done}</b> de ${total} partidos jugados</span>`;
+  document.getElementById("foot").textContent=`Actualizado el ${up.toLocaleDateString("es-ES",{day:"numeric",month:"long"})} a las ${up.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})} · Complejo Altomira`;
+}
+
+const TABS=[...document.querySelectorAll(".tab")];
+function show(id){
+  if(!document.getElementById(id)) id="proxima";
+  TABS.forEach(t=>t.setAttribute("aria-selected",t.dataset.t===id));
+  document.querySelectorAll("main section").forEach(s=>s.hidden=s.id!==id);
+  try{localStorage.setItem("tab",id)}catch(e){}
+  const a=TABS.find(t=>t.dataset.t===id); try{const bar=a&&a.parentElement; if(bar&&bar.scrollWidth>bar.clientWidth) bar.scrollLeft=a.offsetLeft-(bar.clientWidth-a.offsetWidth)/2;}catch(e){}
+}
+TABS.forEach(t=>t.addEventListener("click",()=>{show(t.dataset.t);if(history.replaceState)history.replaceState(null,"","#"+t.dataset.t)}));
+
+function renderAll(){
+renderMeta();renderAvisos();renderMine();renderProxima();renderTable();renderPlayoffs();renderMVP();renderPuskas();renderAficion();renderOfertas();renderJ();renderPichichi();renderZamora();renderCards();renderTeams();renderAwards();renderAsis();renderSponsors();
+}
+const sel=document.getElementById("myteam");
+sel.innerHTML=`<option value="">Elige tu equipo</option>`+DATA.teams.map(t=>`<option value="${t.id}"${t.id===MY?" selected":""}>${esc(t.name)}</option>`).join("");
+sel.addEventListener("change",()=>{MY=sel.value||null;try{MY?localStorage.setItem("myteam",MY):localStorage.removeItem("myteam")}catch(e){}FICHA=MY||FICHA;renderAll();});
+document.addEventListener("click",e=>{
+  const f=e.target.closest&&e.target.closest("[data-ficha]"); if(f){FICHA=f.dataset.ficha;renderTeams();return;}
+  const b=e.target.closest&&e.target.closest("[data-team]"); if(b){FICHA=b.dataset.team;renderTeams();show("equipos");if(history.replaceState)history.replaceState(null,"","#equipos");window.scrollTo&&window.scrollTo(0,0);}
+});
+renderAll();
+let start=(location.hash||"").slice(1); if(!start){try{start=localStorage.getItem("tab")||""}catch(e){}}
+show(start||"proxima");
+</script>
+
+</body>
+</html>
