@@ -139,6 +139,7 @@ td.wrapc{white-space:normal;min-width:140px}
 .rules summary{cursor:pointer;font-weight:600}
 .rules p{margin:6px 0 0;color:var(--muted)}
 footer{color:var(--muted);font-size:13px;text-align:center}
+main section{scroll-margin-top:110px}
 .mine{background:color-mix(in srgb,var(--lime) 10%,transparent)}
 .match.mine{border-radius:8px;padding-inline:8px}
 .pick{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap}
@@ -303,7 +304,7 @@ select{font:inherit;font-weight:600;color:var(--fg);background:var(--surface);bo
 </section>
 
 <section id="equipos" class="stack" hidden>
-  <h2>Equipos</h2>
+  <h2>Equipos <small>Elige un equipo para ver su ficha</small></h2>
   <div class="tchips" id="tchips"></div>
   <div id="ficha" class="stack"></div>
 </section>
@@ -491,32 +492,61 @@ function renderCards(){
   document.getElementById("sanc").innerHTML = `<h3 style="margin-bottom:8px">Sancionados ahora</h3>` + (act.length ? act.map(z=>`<div style="padding:6px 0;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center">${susText(z)} <b>${esc(z.player)}</b> <span style="color:var(--muted)">· ${esc(T[z.team].name)} · ${z.kind==="Y"?"Acumulación de amarillas":z.kind==="M"?esc(z.reason):CARD_LABEL[z.type]}</span></div>`).join("") : `<div style="color:var(--muted)">Nadie está sancionado ahora mismo.</div>`);
 }
 
+function nextMatchText(id){
+  for(const j of DATA.jornadas){ const m=teamMatchIn(j,id);
+    if(!m){ if(j.matches.some(x=>!played(x)&&!postponed(x))) return `Descansa en la jornada ${j.n}`; continue; }
+    if(played(m)||postponed(m)) continue;
+    const home=m.home===id; return `J${j.n} · ${home?"en casa":"fuera"} contra ${T[home?m.away:m.home].name}${m.time?` · ${m.time}`:""}${j.date?` · ${fmtDate(j.date)}`:""}`; }
+  return "Liga regular terminada";
+}
+function teamStats(id){
+  const P={}; const t=T[id];
+  t.players.forEach((p,i)=>P[p.name]={name:p.name,dorsal:p.dorsal,ord:i,g:0,a:0,mvp:0,y:0,r:0});
+  const get=n=>P[n]||(P[n]={name:n,dorsal:null,ord:999,g:0,a:0,mvp:0,y:0,r:0});
+  playedMatches.forEach(m=>{
+    (m.goals||[]).forEach(x=>{ if(x.team===id&&!x.og) get(x.player).g++; if(x.team===id&&x.assist) get(x.assist).a++; });
+    (m.cards||[]).filter(x=>x.team===id).forEach(x=>{ x.type==="Y"?get(x.player).y++:get(x.player).r++; });
+  });
+  DATA.jornadas.forEach(j=>{ if(j.mvp&&j.mvp.team===id) get(j.mvp.player).mvp++; });
+  return Object.values(P).sort((a,b)=>b.g-a.g||b.a-a.a||b.mvp-a.mvp||a.ord-b.ord);
+}
+function topOf(list,k){ const m=Math.max(0,...list.map(p=>p[k])); if(!m) return null; const w=list.filter(p=>p[k]===m); return `${w.map(p=>esc(p.name)).join(", ")} · ${m}`; }
 function renderTeams(){
   if(!FICHA) FICHA=MY||DATA.teams[0].id;
-  document.getElementById("tchips").innerHTML=DATA.teams.map(t=>`<button class="tchip" aria-pressed="${t.id===FICHA}" data-ficha="${t.id}">${esc(t.name)}</button>`).join("");
-  const id=FICHA, t=T[id]; const rows=table(); const pos=rows.findIndex(r=>r.id===id); const r=rows[pos];
+  document.getElementById("tchips").innerHTML=DATA.teams.map(t=>`<button class="tchip" aria-pressed="${t.id===FICHA}" data-ficha="${t.id}">${t.id===MY?"★ ":""}${esc(t.name)}</button>`).join("");
+  const id=FICHA, t=T[id]; const rows=table(); const pos=rows.findIndex(r=>r.id===id); const r=rows[pos]; const seed=pos+1;
+  const cruce = rows.length!==7 ? "" : seed===1 ? "Semifinal directa" : `Cuartos contra ${T[rows[(9-seed)-1].id].name} (${9-seed}.º)`;
+  // próximo partido y último resultado
+  const nxt=nextMatchText(id);
+  const pl=allMatches.filter(m=>played(m)&&(m.home===id||m.away===id)); const lm=pl[pl.length-1];
+  const last = lm ? (()=>{ const home=lm.home===id; const gf=home?lm.hs:lm.as, gc=home?lm.as:lm.hs; return `J${lm.j} · ${gf}–${gc} contra ${T[home?lm.away:lm.home].name} (${gf>gc?"victoria":gf<gc?"derrota":"empate"})`; })() : "Todavía no ha jugado";
+  const form = r.form.length ? `<span class="form">${r.form.slice(-5).map(f=>`<i class="${f}">${{W:"G",D:"E",L:"P"}[f]}</i>`).join("")}</span>` : "–";
+  const avgGc = r.pj ? (r.gc/r.pj).toFixed(2).replace(".",",") : "–";
+  const ST=teamStats(id);
+  const risk=ST.filter(p=>p.y%3===2).map(p=>esc(p.name));
+  const S=suspensions().filter(z=>z.team===id&&z.state!=="cumplida");
   const cal=DATA.jornadas.map(j=>{ const m=teamMatchIn(j,id);
     if(!m) return `<div class="r"><span class="j">J${j.n}</span><span style="color:var(--muted)">Descansa</span><span></span></div>`;
     const home=m.home===id, riv=home?m.away:m.home;
     let res=`<span class="chip">${postponed(m)?"Aplazado":esc(m.time||(j.date?fmtDate(j.date):"Por confirmar"))}</span>`;
     if(played(m)){ const gf=home?m.hs:m.as, gc=home?m.as:m.hs; const k=gf>gc?"W":gf<gc?"L":"D"; res=`<span class="res ${k}">${gf}–${gc}</span>`; }
     return `<div class="r"><span class="j">J${j.n}</span><span style="min-width:0">${home?"vs":"en"} ${esc(T[riv].name)}</span>${res}</div>`; }).join("");
-  const g={}; playedMatches.forEach(m=>m.goals.filter(x=>x.team===id&&!x.og).forEach(x=>g[x.player]=(g[x.player]||0)+1));
-  const gl=Object.entries(g).sort((a,b)=>b[1]-a[1]);
   const h2h=DATA.teams.filter(o=>o.id!==id).map(o=>{ const x={pj:0,g:0,e:0,p:0,gf:0,gc:0};
     playedMatches.filter(m=>(m.home===id&&m.away===o.id)||(m.home===o.id&&m.away===id)).forEach(m=>{const home=m.home===id;const a=home?m.hs:m.as,b=home?m.as:m.hs;x.pj++;x.gf+=a;x.gc+=b;a>b?x.g++:a<b?x.p++:x.e++;});
     return `<tr><td class="l team">${esc(o.name)}</td><td>${x.pj}</td><td>${x.g}</td><td>${x.e}</td><td>${x.p}</td><td>${x.gf}–${x.gc}</td></tr>`; }).join("");
-  const S=suspensions().filter(z=>z.team===id&&z.state!=="cumplida");
+  const kv=(k,v)=>`<div><div class="k">${k}</div><div class="v">${v}</div></div>`;
+  const plTable = ST.length ? `<table><thead><tr><th class="l">Jugador</th><th title="Dorsal">#</th><th title="Goles">Goles</th><th title="Asistencias">Asist.</th><th title="Veces MVP de jornada">MVP</th><th title="Amarillas"><span class="card-y"></span></th><th title="Rojas"><span class="card-r"></span></th></tr></thead><tbody>${ST.map(p=>`<tr><td class="l team wrapc">${esc(p.name)}</td><td>${p.dorsal??"–"}</td><td class="pts">${p.g}</td><td>${p.a}</td><td>${p.mvp}</td><td>${p.y}</td><td>${p.r}</td></tr>`).join("")}</tbody></table>` : `<p style="color:var(--muted);margin:0">Plantilla pendiente de recibir.</p>`;
   document.getElementById("ficha").innerHTML=`
     <div class="panel"><div class="big">${esc(t.name)}</div><div style="color:var(--muted)">${t.delegate?`Delegado: ${esc(t.delegate)}`:"Delegado por confirmar"}${t.goalkeeper?` · Portero: ${esc(t.goalkeeper)}`:""}</div>
-      <div class="myteam" style="border:0"><div class="row"><div><div class="k">Posición</div><div class="v">${pos+1}.º</div></div><div><div class="k">Puntos</div><div class="v">${r.pts}</div></div><div><div class="k">Balance</div><div class="v">${r.g}G · ${r.e}E · ${r.p}P</div></div><div><div class="k">Goles</div><div class="v">${r.gf} a favor · ${r.gc} en contra</div></div><div><div class="k">Sancionados</div><div class="v">${S.length?S.map(z=>esc(z.player)).join(", "):"Ninguno"}</div></div></div></div></div>
+      <div class="myteam" style="border:0"><div class="row">${kv("Posición",`${seed}.º · ${r.pts} pts`)}${kv("Balance",`${r.g}G · ${r.e}E · ${r.p}P`)}${kv("Goles",`${r.gf} a favor · ${r.gc} en contra`)}${kv("Últimos",form)}${cruce?kv("Play-off hoy",esc(cruce)):""}</div>
+      <div class="row">${kv("Próximo partido",esc(nxt))}${kv("Último resultado",esc(last))}</div></div></div>
+    <div class="panel"><h3 style="margin-bottom:6px">Destacados del equipo</h3><div class="myteam" style="border:0"><div class="row">
+      ${kv("Máximo goleador",topOf(ST,"g")||"–")}${kv("Máximo asistente",topOf(ST,"a")||"–")}${kv("Más veces MVP",topOf(ST,"mvp")||"–")}${kv("Goles encajados por partido",avgGc)}${kv("Sancionados",S.length?S.map(z=>esc(z.player)).join(", "):"Ninguno")}${kv("Con 2 amarillas",risk.length?risk.join(", "):"Nadie")}
+    </div></div></div>
+    <div class="panel scroll"><h3 style="margin-bottom:6px">Plantilla y estadísticas</h3>${plTable}</div>
     <div class="grid2">
       <div class="panel"><h3 style="margin-bottom:6px">Calendario</h3><div class="cal">${cal}</div></div>
-      <div class="stack">
-        <div class="panel"><h3 style="margin-bottom:6px">Goleadores</h3>${gl.length?gl.map(([n,c])=>`<div style="display:flex;justify-content:space-between;padding:4px 0"><span>${esc(n)}</span><b>${c}</b></div>`).join(""):`<div style="color:var(--muted)">Sin goles todavía.</div>`}</div>
-        <div class="panel scroll"><h3 style="margin-bottom:6px">Contra cada rival</h3><table><thead><tr><th class="l">Rival</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>Goles</th></tr></thead><tbody>${h2h}</tbody></table></div>
-        <div class="panel teamcard"><h3 style="margin-bottom:6px">Plantilla</h3>${t.players.length?`<ol>${t.players.map(p=>`<li>${esc(p.name)}${p.dorsal!=null?` <span class="chip">#${p.dorsal}</span>`:""}</li>`).join("")}</ol>`:`<p style="color:var(--muted);margin:0">Plantilla pendiente de recibir.</p>`}</div>
-      </div>
+      <div class="panel scroll"><h3 style="margin-bottom:6px">Contra cada rival</h3><table><thead><tr><th class="l">Rival</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>Goles</th></tr></thead><tbody>${h2h}</tbody></table></div>
     </div>`;
 }
 
@@ -546,8 +576,7 @@ function renderAvisos(){
 function renderMine(){
   const el=document.getElementById("pxmine"); if(!MY){el.hidden=true;return;} el.hidden=false;
   const rows=table(); const pos=rows.findIndex(r=>r.id===MY); const r=rows[pos];
-  const nj=nextJ(); let nxt="Liga regular terminada";
-  if(nj){ const m=teamMatchIn(nj,MY); if(!m) nxt=`Descansa en la jornada ${nj.n}`; else { const home=m.home===MY; const riv=T[home?m.away:m.home].name; nxt=`J${nj.n} · ${home?"en casa":"fuera"} contra ${riv}${m.time?` · ${m.time}`:""}${nj.date?` · ${fmtDate(nj.date)}`:""}`; } }
+  const nxt=nextMatchText(MY);
   const sus=suspensions().filter(z=>z.team===MY&&z.state!=="cumplida");
   el.innerHTML=`<h3>Mi equipo</h3><div class="big" style="font-size:28px">${esc(T[MY].name)}</div>
     <div class="row"><div><div class="k">Posición</div><div class="v">${pos+1}.º · ${r.pts} pts</div></div><div><div class="k">Próximo partido</div><div class="v">${esc(nxt)}</div></div><div><div class="k">Sancionados</div><div class="v">${sus.length?sus.map(z=>esc(z.player)).join(", "):"Ninguno"}</div></div></div>`;
@@ -674,7 +703,8 @@ renderMeta();renderAvisos();renderMine();renderProxima();renderTable();renderPla
 }
 const sel=document.getElementById("myteam");
 sel.innerHTML=`<option value="">Elige tu equipo</option>`+DATA.teams.map(t=>`<option value="${t.id}"${t.id===MY?" selected":""}>${esc(t.name)}</option>`).join("");
-sel.addEventListener("change",()=>{MY=sel.value||null;try{MY?localStorage.setItem("myteam",MY):localStorage.removeItem("myteam")}catch(e){}FICHA=MY||FICHA;renderAll();});
+sel.addEventListener("change",()=>{MY=sel.value||null;try{MY?localStorage.setItem("myteam",MY):localStorage.removeItem("myteam")}catch(e){}FICHA=MY||FICHA;renderAll();
+  if(MY){ show("equipos"); if(history.replaceState)history.replaceState(null,"","#equipos"); const f=document.getElementById("equipos"); try{ f.scrollIntoView({block:"start"}); }catch(e){} }});
 document.addEventListener("click",e=>{
   const f=e.target.closest&&e.target.closest("[data-ficha]"); if(f){FICHA=f.dataset.ficha;renderTeams();return;}
   const b=e.target.closest&&e.target.closest("[data-team]"); if(b){FICHA=b.dataset.team;renderTeams();show("equipos");if(history.replaceState)history.replaceState(null,"","#equipos");window.scrollTo&&window.scrollTo(0,0);}
