@@ -509,7 +509,8 @@ function renderTeams(){
   const pl=allMatches.filter(m=>played(m)&&(m.home===id||m.away===id)); const lm=pl[pl.length-1];
   const last = lm ? (()=>{ const home=lm.home===id; const gf=home?lm.hs:lm.as, gc=home?lm.as:lm.hs; return `J${lm.j} · ${gf}–${gc} contra ${T[home?lm.away:lm.home].name} (${gf>gc?"victoria":gf<gc?"derrota":"empate"})`; })() : "Todavía no ha jugado";
   const form = r.form.length ? `<span class="form">${r.form.slice(-5).map(f=>`<i class="${f}">${{W:"G",D:"E",L:"P"}[f]}</i>`).join("")}</span>` : "–";
-  const avgGc = r.pj ? (r.gc/r.pj).toFixed(2).replace(".",",") : "–";
+  const avgGc = r.pj ? (r.gc/r.pj).toFixed(2).replace(".",",") : "0,00";
+  const cs = pl.filter(m=>(m.home===id?m.as:m.hs)===0).length;
   const ST=teamStats(id);
   const risk=ST.filter(p=>p.y%3===2).map(p=>esc(p.name));
   const S=suspensions().filter(z=>z.team===id&&z.state!=="cumplida");
@@ -523,13 +524,13 @@ function renderTeams(){
     playedMatches.filter(m=>(m.home===id&&m.away===o.id)||(m.home===o.id&&m.away===id)).forEach(m=>{const home=m.home===id;const a=home?m.hs:m.as,b=home?m.as:m.hs;x.pj++;x.gf+=a;x.gc+=b;a>b?x.g++:a<b?x.p++:x.e++;});
     return `<tr><td class="l team">${esc(o.name)}</td><td>${x.pj}</td><td>${x.g}</td><td>${x.e}</td><td>${x.p}</td><td>${x.gf}–${x.gc}</td></tr>`; }).join("");
   const kv=(k,v)=>`<div><div class="k">${k}</div><div class="v">${v}</div></div>`;
-  const plTable = ST.length ? `<table><thead><tr><th class="l">Jugador</th><th title="Dorsal">#</th><th title="Goles">Goles</th><th title="Veces MVP de jornada">MVP</th><th title="Amarillas"><span class="card-y"></span></th><th title="Rojas"><span class="card-r"></span></th></tr></thead><tbody>${ST.map(p=>`<tr><td class="l team wrapc">${esc(p.name)}</td><td>${p.dorsal??"–"}</td><td class="pts">${p.g}</td><td>${p.mvp}</td><td>${p.y}</td><td>${p.r}</td></tr>`).join("")}</tbody></table>` : `<p style="color:var(--muted);margin:0">Plantilla pendiente de recibir.</p>`;
+  const plTable = ST.length ? `<table><thead><tr><th class="l">Jugador</th><th title="Dorsal">#</th><th title="Goles">Goles</th><th title="Veces MVP de jornada">MVP</th><th title="Amarillas"><span class="card-y"></span></th><th title="Rojas"><span class="card-r"></span></th></tr></thead><tbody>${ST.map(p=>`<tr><td class="l team wrapc">${esc(p.name)}${p.name===t.goalkeeper?' <span class="chip">Portero</span>':''}</td><td>${p.dorsal??"–"}</td><td class="pts">${p.g}</td><td>${p.mvp}</td><td>${p.y}</td><td>${p.r}</td></tr>`).join("")}</tbody></table>` : `<p style="color:var(--muted);margin:0">Plantilla pendiente de recibir.</p>`;
   document.getElementById("ficha").innerHTML=`
     <div class="panel"><div class="big">${esc(t.name)}</div><div style="color:var(--muted)">${t.delegate?`Delegado: ${esc(t.delegate)}`:"Delegado por confirmar"}${t.goalkeeper?` · Portero: ${esc(t.goalkeeper)}`:""}</div>
       <div class="myteam" style="border:0"><div class="row">${kv("Posición",`${seed}.º · ${r.pts} pts`)}${kv("Balance",`${r.g}G · ${r.e}E · ${r.p}P`)}${kv("Goles",`${r.gf} a favor · ${r.gc} en contra`)}${kv("Últimos",form)}${cruce?kv("Play-off hoy",esc(cruce)):""}</div>
       <div class="row">${kv("Próximo partido",esc(nxt))}${kv("Último resultado",esc(last))}</div></div></div>
     <div class="panel"><h3 style="margin-bottom:6px">Destacados del equipo</h3><div class="myteam" style="border:0"><div class="row">
-      ${kv("Máximo goleador",topOf(ST,"g")||"–")}${kv("Más veces MVP",topOf(ST,"mvp")||"–")}${kv("Goles encajados por partido",avgGc)}${kv("Sancionados",S.length?S.map(z=>esc(z.player)).join(", "):"Ninguno")}${kv("Con 2 amarillas",risk.length?risk.join(", "):"Nadie")}
+      ${kv("Máximo goleador",topOf(ST,"g")||"–")}${kv("Más veces MVP",topOf(ST,"mvp")||"–")}${kv("Portero",t.goalkeeper?`${esc(t.goalkeeper)}<br><span style="font-weight:500;color:var(--muted)">${r.gc} ${r.gc===1?"gol encajado":"goles encajados"} · ${avgGc} por partido · ${cs} ${cs===1?"partido imbatido":"partidos imbatidos"}</span>`:`<span style="color:var(--muted);font-weight:500">Por designar</span>`)}${kv("Sancionados",S.length?S.map(z=>esc(z.player)).join(", "):"Ninguno")}${kv("Con 2 amarillas",risk.length?risk.join(", "):"Nadie")}
     </div></div></div>
     <div class="panel scroll"><h3 style="margin-bottom:6px">Plantilla y estadísticas</h3>${plTable}</div>
     <div class="grid2">
