@@ -57,6 +57,12 @@ td{padding:10px 6px;text-align:center;border-bottom:1px solid var(--line);white-
 tr:last-child td{border-bottom:0}
 th.l,td.l{text-align:left}
 td.pos{font-family:var(--display);font-weight:800;font-style:italic;font-size:20px;width:34px}
+.q1{--pc:var(--gold)} .q2{--pc:#5aa9ff} .q3{--pc:#ff9f43} .q4{--pc:#b98cff}
+tr[class*=" q"] td.pos{box-shadow:inset 4px 0 0 var(--pc)}
+.qtag{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 6px;border-radius:4px;margin-left:6px;vertical-align:middle;color:var(--pc);background:color-mix(in srgb,var(--pc) 18%,transparent);white-space:nowrap}
+.qsum{color:var(--muted);font-size:14px}
+.qsum b{color:var(--fg);font-weight:600}
+@media (max-width:520px){.qtag .long{display:none}}
 tr.cut td{border-bottom:2px solid color-mix(in srgb,var(--lime) 55%,transparent)}
 tr.p1 td.pos{color:var(--gold)} tr.p2 td.pos{color:var(--silver)}
 td.team{font-weight:600;white-space:normal;min-width:150px}
@@ -222,6 +228,7 @@ select{font:inherit;font-weight:600;color:var(--fg);background:var(--surface);bo
 <section id="clasificacion" class="stack" hidden>
   <h2>Clasificación <small id="cl-sub"></small></h2>
   <div class="panel scroll"><table id="tbl"></table></div>
+  <p class="qsum" id="qsum"></p>
   <div class="legend">
     <span>Victoria 3 · Empate 1 · Derrota 0</span>
     <span>18 partidos por equipo. Todos juegan los play-offs: el 1.º pasa directo a semifinales y del 2.º al 7.º juegan cuartos (2.º–7.º, 3.º–6.º, 4.º–5.º).</span>
@@ -368,12 +375,15 @@ function renderTable(){
   document.getElementById("cl-sub").textContent = anyPlayed ? `Tras la jornada ${Math.max(...playedMatches.map(m=>m.j))}` : "La liga aún no ha empezado";
   let h=`<thead><tr><th>#</th><th class="l">Equipo</th><th>Pts</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th class="hide-sm">GF</th><th class="hide-sm">GC</th><th>DG</th><th class="hide-sm">Últimos</th></tr></thead><tbody>`;
   rows.forEach((r,i)=>{
-    const prize = i===0 ? '<span class="prize g">Semifinal directa</span>' : '';
+    const pos=i+1, riv=pos===1?null:9-pos, grp=pos===1?1:Math.min(pos,9-pos);
+    const prize = rows.length===7 ? (pos===1 ? '<span class="qtag">Semifinal directa</span>' : `<span class="qtag"><span class="long">Cuartos · </span>vs ${riv}.º</span>`) : '';
     const form = r.form.length ? `<span class="form">${r.form.slice(-5).map(f=>`<i class="${f}">${{W:"G",D:"E",L:"P"}[f]}</i>`).join("")}</span>` : '<span class="form"><span class="none">–</span></span>';
     const apl=allMatches.some(m=>postponed(m)&&(m.home===r.id||m.away===r.id));
-    h+=`<tr class="p${i+1}${i===0?" cut":""}${mine(r.id)}"><td class="pos">${i+1}</td><td class="l team">${teamBtn(r.id)}${apl?' <span title="Tiene un partido aplazado" style="color:var(--yellow)">*</span>':''}${prize}</td><td class="pts">${r.pts}</td><td>${r.pj}</td><td>${r.g}</td><td>${r.e}</td><td>${r.p}</td><td class="hide-sm">${r.gf}</td><td class="hide-sm">${r.gc}</td><td>${r.dg>0?"+":""}${r.dg}</td><td class="hide-sm">${form}</td></tr>`;
+    h+=`<tr class="p${i+1}${i===0?" cut":""} q${rows.length===7?grp:0}${mine(r.id)}"><td class="pos">${i+1}</td><td class="l team">${teamBtn(r.id)}${apl?' <span title="Tiene un partido aplazado" style="color:var(--yellow)">*</span>':''}${prize}</td><td class="pts">${r.pts}</td><td>${r.pj}</td><td>${r.g}</td><td>${r.e}</td><td>${r.p}</td><td class="hide-sm">${r.gf}</td><td class="hide-sm">${r.gc}</td><td>${r.dg>0?"+":""}${r.dg}</td><td class="hide-sm">${form}</td></tr>`;
   });
   document.getElementById("tbl").innerHTML=h+"</tbody>";
+  const nm=k=>esc(T[rows[k-1].id].name);
+  document.getElementById("qsum").innerHTML = rows.length===7 ? `${anyPlayed?"Si la liga terminara hoy":"Cruces según la clasificación actual"} · Semifinal directa: <b>${nm(1)}</b> · Cuartos: <b>${nm(2)}</b> – <b>${nm(7)}</b> · <b>${nm(3)}</b> – <b>${nm(6)}</b> · <b>${nm(4)}</b> – <b>${nm(5)}</b>` : "";
 }
 
 let curJ = (()=>{const p=DATA.jornadas.filter(j=>j.matches.some(played));const next=DATA.jornadas.find(j=>j.matches.some(m=>!played(m)&&!postponed(m)));return next?next.n:(p.length?p[p.length-1].n:1)})();
