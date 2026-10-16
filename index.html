@@ -253,8 +253,6 @@ select{font:inherit;font-weight:600;color:var(--fg);background:var(--surface);bo
 <section id="pichichi" class="stack" hidden>
   <h2>Pichichi <small>Máximo goleador</small></h2>
   <div class="panel scroll"><table id="tpich"></table></div>
-  <h3>Asistencias</h3>
-  <div class="panel scroll"><table id="tasis"></table></div>
 </section>
 
 <section id="mvp" class="stack" hidden>
@@ -401,10 +399,9 @@ function renderJ(){
         const g={};m.goals.filter(x=>x.team===tid&&!x.og).forEach(x=>g[x.player]=(g[x.player]||0)+1);
         const og=m.goals.filter(x=>x.team!==tid&&x.og).map(x=>`${esc(x.player)} (p.p.)`);
         const goals=Object.entries(g).map(([n,c])=>`⚽ ${esc(n)}${c>1?` ×${c}`:""}`).concat(og.map(x=>"⚽ "+x));
-        const as={};m.goals.filter(x=>x.team===tid&&x.assist).forEach(x=>as[x.assist]=(as[x.assist]||0)+1);
-        const asl=Object.entries(as).map(([n,c])=>`🅰️ ${esc(n)}${c>1?` ×${c}`:""}`);
+
         const cards=m.cards.filter(x=>x.team===tid).map(x=>x.type==="YY"?`<span class="card-y"></span><span class="card-r"></span>${esc(x.player)}`:`<span class="card-${x.type==="R"?"r":"y"}"></span>${esc(x.player)}`);
-        return goals.concat(asl,cards).join("<br>");
+        return goals.concat(cards).join("<br>");
       };
       h+=`<div class="mdetail"><div class="h">${side(m.home)}</div><div>${side(m.away)}</div>${m.note?`<div class="full">${esc(m.note)}</div>`:""}</div>`;
     }
@@ -423,15 +420,6 @@ function renderPichichi(){
   if(!rows.length){el.innerHTML=`<tbody><tr><td class="empty">Aquí aparecerán los goleadores en cuanto se juegue la primera jornada.</td></tr></tbody>`;return;}
   let pos=0,last=null;
   el.innerHTML=`<thead><tr><th>#</th><th class="l">Jugador</th><th class="l">Equipo</th><th>Goles</th></tr></thead><tbody>`+rows.map((r,i)=>{if(r.n!==last){pos=i+1;last=r.n}return`<tr class="p${pos}${mine(r.t)}"><td class="pos">${pos}</td><td class="l team">${esc(r.p)}</td><td class="l" style="color:var(--muted)">${esc(T[r.t].name)}</td><td class="pts">${r.n}</td></tr>`}).join("")+"</tbody>";
-}
-
-function renderAsis(){
-  const c={};playedMatches.forEach(m=>m.goals.filter(g=>g.assist).forEach(g=>{const k=g.team+"|"+g.assist;c[k]=(c[k]||0)+1}));
-  const rows=Object.entries(c).map(([k,n])=>{const[t,p]=k.split("|");return{t,p,n}}).sort((a,b)=>b.n-a.n||a.p.localeCompare(b.p,"es"));
-  const el=document.getElementById("tasis");
-  if(!rows.length){el.innerHTML=`<tbody><tr><td class="empty">Aquí aparecerán los asistentes cuando se registren las primeras asistencias.</td></tr></tbody>`;return;}
-  let pos=0,last=null;
-  el.innerHTML=`<thead><tr><th>#</th><th class="l">Jugador</th><th class="l">Equipo</th><th>Asist.</th></tr></thead><tbody>`+rows.map((r,i)=>{if(r.n!==last){pos=i+1;last=r.n}return`<tr class="p${pos}${mine(r.t)}"><td class="pos">${pos}</td><td class="l team">${esc(r.p)}</td><td class="l" style="color:var(--muted)">${esc(T[r.t].name)}</td><td class="pts">${r.n}</td></tr>`}).join("")+"</tbody>";
 }
 
 function renderZamora(){
@@ -504,11 +492,11 @@ function teamStats(id){
   t.players.forEach((p,i)=>P[p.name]={name:p.name,dorsal:p.dorsal,ord:i,g:0,a:0,mvp:0,y:0,r:0});
   const get=n=>P[n]||(P[n]={name:n,dorsal:null,ord:999,g:0,a:0,mvp:0,y:0,r:0});
   playedMatches.forEach(m=>{
-    (m.goals||[]).forEach(x=>{ if(x.team===id&&!x.og) get(x.player).g++; if(x.team===id&&x.assist) get(x.assist).a++; });
+    (m.goals||[]).forEach(x=>{ if(x.team===id&&!x.og) get(x.player).g++; });
     (m.cards||[]).filter(x=>x.team===id).forEach(x=>{ x.type==="Y"?get(x.player).y++:get(x.player).r++; });
   });
   DATA.jornadas.forEach(j=>{ if(j.mvp&&j.mvp.team===id) get(j.mvp.player).mvp++; });
-  return Object.values(P).sort((a,b)=>b.g-a.g||b.a-a.a||b.mvp-a.mvp||a.ord-b.ord);
+  return Object.values(P).sort((a,b)=>b.g-a.g||b.mvp-a.mvp||a.ord-b.ord);
 }
 function topOf(list,k){ const m=Math.max(0,...list.map(p=>p[k])); if(!m) return null; const w=list.filter(p=>p[k]===m); return `${w.map(p=>esc(p.name)).join(", ")} · ${m}`; }
 function renderTeams(){
@@ -535,13 +523,13 @@ function renderTeams(){
     playedMatches.filter(m=>(m.home===id&&m.away===o.id)||(m.home===o.id&&m.away===id)).forEach(m=>{const home=m.home===id;const a=home?m.hs:m.as,b=home?m.as:m.hs;x.pj++;x.gf+=a;x.gc+=b;a>b?x.g++:a<b?x.p++:x.e++;});
     return `<tr><td class="l team">${esc(o.name)}</td><td>${x.pj}</td><td>${x.g}</td><td>${x.e}</td><td>${x.p}</td><td>${x.gf}–${x.gc}</td></tr>`; }).join("");
   const kv=(k,v)=>`<div><div class="k">${k}</div><div class="v">${v}</div></div>`;
-  const plTable = ST.length ? `<table><thead><tr><th class="l">Jugador</th><th title="Dorsal">#</th><th title="Goles">Goles</th><th title="Asistencias">Asist.</th><th title="Veces MVP de jornada">MVP</th><th title="Amarillas"><span class="card-y"></span></th><th title="Rojas"><span class="card-r"></span></th></tr></thead><tbody>${ST.map(p=>`<tr><td class="l team wrapc">${esc(p.name)}</td><td>${p.dorsal??"–"}</td><td class="pts">${p.g}</td><td>${p.a}</td><td>${p.mvp}</td><td>${p.y}</td><td>${p.r}</td></tr>`).join("")}</tbody></table>` : `<p style="color:var(--muted);margin:0">Plantilla pendiente de recibir.</p>`;
+  const plTable = ST.length ? `<table><thead><tr><th class="l">Jugador</th><th title="Dorsal">#</th><th title="Goles">Goles</th><th title="Veces MVP de jornada">MVP</th><th title="Amarillas"><span class="card-y"></span></th><th title="Rojas"><span class="card-r"></span></th></tr></thead><tbody>${ST.map(p=>`<tr><td class="l team wrapc">${esc(p.name)}</td><td>${p.dorsal??"–"}</td><td class="pts">${p.g}</td><td>${p.mvp}</td><td>${p.y}</td><td>${p.r}</td></tr>`).join("")}</tbody></table>` : `<p style="color:var(--muted);margin:0">Plantilla pendiente de recibir.</p>`;
   document.getElementById("ficha").innerHTML=`
     <div class="panel"><div class="big">${esc(t.name)}</div><div style="color:var(--muted)">${t.delegate?`Delegado: ${esc(t.delegate)}`:"Delegado por confirmar"}${t.goalkeeper?` · Portero: ${esc(t.goalkeeper)}`:""}</div>
       <div class="myteam" style="border:0"><div class="row">${kv("Posición",`${seed}.º · ${r.pts} pts`)}${kv("Balance",`${r.g}G · ${r.e}E · ${r.p}P`)}${kv("Goles",`${r.gf} a favor · ${r.gc} en contra`)}${kv("Últimos",form)}${cruce?kv("Play-off hoy",esc(cruce)):""}</div>
       <div class="row">${kv("Próximo partido",esc(nxt))}${kv("Último resultado",esc(last))}</div></div></div>
     <div class="panel"><h3 style="margin-bottom:6px">Destacados del equipo</h3><div class="myteam" style="border:0"><div class="row">
-      ${kv("Máximo goleador",topOf(ST,"g")||"–")}${kv("Máximo asistente",topOf(ST,"a")||"–")}${kv("Más veces MVP",topOf(ST,"mvp")||"–")}${kv("Goles encajados por partido",avgGc)}${kv("Sancionados",S.length?S.map(z=>esc(z.player)).join(", "):"Ninguno")}${kv("Con 2 amarillas",risk.length?risk.join(", "):"Nadie")}
+      ${kv("Máximo goleador",topOf(ST,"g")||"–")}${kv("Más veces MVP",topOf(ST,"mvp")||"–")}${kv("Goles encajados por partido",avgGc)}${kv("Sancionados",S.length?S.map(z=>esc(z.player)).join(", "):"Ninguno")}${kv("Con 2 amarillas",risk.length?risk.join(", "):"Nadie")}
     </div></div></div>
     <div class="panel scroll"><h3 style="margin-bottom:6px">Plantilla y estadísticas</h3>${plTable}</div>
     <div class="grid2">
@@ -699,7 +687,7 @@ function show(id){
 TABS.forEach(t=>t.addEventListener("click",()=>{show(t.dataset.t);if(history.replaceState)history.replaceState(null,"","#"+t.dataset.t)}));
 
 function renderAll(){
-renderMeta();renderAvisos();renderMine();renderProxima();renderTable();renderPlayoffs();renderMVP();renderPuskas();renderAficion();renderOfertas();renderJ();renderPichichi();renderZamora();renderCards();renderTeams();renderAwards();renderAsis();renderSponsors();
+renderMeta();renderAvisos();renderMine();renderProxima();renderTable();renderPlayoffs();renderMVP();renderPuskas();renderAficion();renderOfertas();renderJ();renderPichichi();renderZamora();renderCards();renderTeams();renderAwards();renderSponsors();
 }
 const sel=document.getElementById("myteam");
 sel.innerHTML=`<option value="">Elige tu equipo</option>`+DATA.teams.map(t=>`<option value="${t.id}"${t.id===MY?" selected":""}>${esc(t.name)}</option>`).join("");
