@@ -675,19 +675,19 @@ function renderAficion(){
     +`<p style="margin:8px 0 0;color:var(--muted)">Al final de la liga, los equipos votarán a la mejor afición, que recibirá un obsequio.</p>`;
 }
 
-const BALL_SVG=`<svg viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="bg1" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#e9eee3"/><stop offset="1" stop-color="#b9c2b3"/></radialGradient></defs><circle cx="50" cy="50" r="47" fill="url(#bg1)" stroke="#0b100c" stroke-width="2"/><polygon points="50,33 66,45 60,64 40,64 34,45" fill="#0b100c"/><g stroke="#0b100c" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M50 33 L50 8"/><path d="M66 45 L89 37"/><path d="M60 64 L74 85"/><path d="M40 64 L26 85"/><path d="M34 45 L11 37"/></g><g fill="#0b100c"><path d="M38 6 L50 8 L62 6 L58 3 L42 3Z"/><path d="M89 37 L96 46 L95 60 L92 50Z"/><path d="M74 85 L86 76 L80 88 L70 93Z"/><path d="M26 85 L14 76 L20 88 L30 93Z"/><path d="M11 37 L4 46 L5 60 L8 50Z"/></g></svg>`;
+let BALL_N=0; const ballSvg=()=>{ const id="ballg"+(++BALL_N); return `<svg viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="${id}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#e9eee3"/><stop offset="1" stop-color="#b9c2b3"/></radialGradient></defs><circle cx="50" cy="50" r="47" fill="url(#${id})" stroke="#0b100c" stroke-width="2"/><polygon points="50,33 66,45 60,64 40,64 34,45" fill="#0b100c"/><g stroke="#0b100c" stroke-width="2.4" fill="none" stroke-linecap="round"><path d="M50 33 L50 8"/><path d="M66 45 L89 37"/><path d="M60 64 L74 85"/><path d="M40 64 L26 85"/><path d="M34 45 L11 37"/></g><g fill="#0b100c"><path d="M38 6 L50 8 L62 6 L58 3 L42 3Z"/><path d="M89 37 L96 46 L95 60 L92 50Z"/><path d="M74 85 L86 76 L80 88 L70 93Z"/><path d="M26 85 L14 76 L20 88 L30 93Z"/><path d="M11 37 L4 46 L5 60 L8 50Z"/></g></svg>`; };
 function activeOffers(){
   return (DATA.ofertas||[]).filter(x=>{ if(x.active===false) return false; if(x.until){ const end=new Date(x.until+"T23:59:59").getTime(); if(NOW>end) return false; } if(x.from){ const st=new Date(x.from+"T00:00:00").getTime(); if(NOW<st) return false; } return true; });
 }
 function renderOfertas(){
   const o=activeOffers();
   const card=x=> x.featured
-    ? `<div class="hero-offer">${x.badge?`<div class="badge">${esc(x.badge)}</div>`:""}<div class="ball">${BALL_SVG}</div><div><div class="eb">Oferta de la semana${x.until?` · hasta el ${esc(fmtDate(x.until))}`:""}</div><h3>${x.titleHtml||esc(x.title)}</h3><p>${esc(x.text)}</p>${x.chips&&x.chips.length?`<div class="meta2">${x.chips.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</div>`:""}</div></div>`
+    ? `<div class="hero-offer">${x.badge?`<div class="badge">${esc(x.badge)}</div>`:""}<div class="ball">${ballSvg()}</div><div><div class="eb">Oferta de la semana${x.until?` · hasta el ${esc(fmtDate(x.until))}`:""}</div><h3>${x.titleHtml||esc(x.title)}</h3><p>${esc(x.text)}</p>${x.chips&&x.chips.length?`<div class="meta2">${x.chips.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</div>`:""}</div></div>`
     : `<div class="panel offer"><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p>${x.where||x.until?`<div class="where">${esc(x.where||"")}${x.where&&x.until?" · ":""}${x.until?`Hasta el ${esc(fmtDate(x.until))}`:""}</div>`:""}</div>`;
   document.getElementById("ofview").innerHTML = o.length ? o.map(card).join("")
     : `<div class="panel empty">Cada semana se publicarán aquí las ofertas del restaurante, las tiendas y las pistas para los participantes de la liga.</div>`;
   const f=o.find(x=>x.featured)||o[0]; const t=document.getElementById("offerteaser");
-  if(t){ t.hidden=!f; t.innerHTML = f ? `<button class="offer-teaser" data-goto="ofertas">${BALL_SVG}<span><span class="k">Oferta de la semana</span><br><span class="v">${esc(f.title)}</span></span><span class="go">Ver →</span></button>` : ""; }
+  if(t){ t.hidden=!f; t.innerHTML = f ? `<button class="offer-teaser" data-goto="ofertas">${ballSvg()}<span><span class="k">Oferta de la semana</span><br><span class="v">${esc(f.title)}</span></span><span class="go">Ver →</span></button>` : ""; }
 }
 
 function renderSponsors(){
