@@ -692,16 +692,19 @@ function pastOffers(){
     .sort((a,b)=>String(b.until).localeCompare(String(a.until)));
 }
 const fmtShort=d=>new Date(d+"T12:00:00").toLocaleDateString("es-ES",{day:"numeric",month:"long"});
+function fmtRange(a,b){ if(!a&&!b) return ""; if(!a) return `hasta el ${fmtShort(b)}`; if(!b) return `desde el ${fmtShort(a)}`;
+  const A=new Date(a+"T12:00:00"), B=new Date(b+"T12:00:00");
+  return A.getMonth()===B.getMonth()&&A.getFullYear()===B.getFullYear() ? `del ${A.getDate()} al ${fmtShort(b)}` : `del ${fmtShort(a)} al ${fmtShort(b)}`; }
 function renderOfertas(){
   const o=activeOffers(); const past=pastOffers();
   const card=x=> x.featured
-    ? `<div class="hero-offer">${x.badge?`<div class="badge">${esc(x.badge)}</div>`:""}<div class="ball">${ballSvg()}</div><div><div class="eb">Oferta de la semana${x.until?` · hasta el ${esc(fmtDate(x.until))}`:""}</div><h3>${x.titleHtml||esc(x.title)}</h3><p>${esc(x.text)}</p>${x.where?`<p class="pickup">📍 ${esc(x.where)}</p>`:""}${x.chips&&x.chips.length?`<div class="meta2">${x.chips.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</div>`:""}</div></div>`
-    : `<div class="panel offer"><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p>${x.where||x.until?`<div class="where">${esc(x.where||"")}${x.where&&x.until?" · ":""}${x.until?`Hasta el ${esc(fmtDate(x.until))}`:""}</div>`:""}</div>`;
-  const hist = past.length ? `<div class="stack" style="margin-top:8px"><h3>Ofertas anteriores</h3><div class="panel past-offers">${past.map(x=>`<div class="po"><div class="po-w">${x.from?`Semana del ${esc(fmtShort(x.from))} al ${esc(fmtShort(x.until))}`:`Hasta el ${esc(fmtShort(x.until))}`}</div><div class="po-t">${esc(x.title)}</div>${x.where?`<div class="po-d">${esc(x.where)}</div>`:""}<span class="chip">Finalizada</span></div>`).join("")}</div></div>` : "";
+    ? `<div class="hero-offer">${x.badge?`<div class="badge">${esc(x.badge)}</div>`:""}<div class="ball">${ballSvg()}</div><div><div class="eb">Oferta de la semana${x.from||x.until?` · ${esc(fmtRange(x.from,x.until))}`:""}</div><h3>${x.titleHtml||esc(x.title)}</h3><p>${esc(x.text)}</p>${x.where?`<p class="pickup">📍 ${esc(x.where)}</p>`:""}${x.chips&&x.chips.length?`<div class="meta2">${x.chips.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</div>`:""}</div></div>`
+    : `<div class="panel offer"><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p>${x.where||x.until||x.from?`<div class="where">${esc(x.where||"")}${x.where&&(x.until||x.from)?" · ":""}${x.until||x.from?esc(fmtRange(x.from,x.until).replace(/^./,c=>c.toUpperCase())):""}</div>`:""}</div>`;
+  const hist = past.length ? `<div class="stack" style="margin-top:8px"><h3>Ofertas anteriores</h3><div class="panel past-offers">${past.map(x=>`<div class="po"><div class="po-w">${esc(fmtRange(x.from,x.until).replace(/^./,c=>c.toUpperCase()))}</div><div class="po-t">${esc(x.title)}</div>${x.where?`<div class="po-d">${esc(x.where)}</div>`:""}<span class="chip">Finalizada</span></div>`).join("")}</div></div>` : "";
   document.getElementById("ofview").innerHTML = (o.length ? o.map(card).join("")
     : `<div class="panel empty">Esta semana no hay ninguna oferta activa. Las nuevas ofertas del restaurante, las tiendas y las pistas aparecerán aquí.</div>`) + hist;
   const f=o.find(x=>x.featured)||o[0]; const t=document.getElementById("offerteaser");
-  if(t){ t.hidden=!f; t.innerHTML = f ? `<button class="offer-teaser" data-goto="ofertas">${ballSvg()}<span><span class="k">Oferta de la semana</span><br><span class="v">${esc(f.title)}</span></span><span class="go">Ver →</span></button>` : ""; }
+  if(t){ t.hidden=!f; t.innerHTML = f ? `<button class="offer-teaser" data-goto="ofertas">${ballSvg()}<span><span class="k">Oferta de la semana${f.from||f.until?` · ${esc(fmtRange(f.from,f.until))}`:""}</span><br><span class="v">${esc(f.title)}</span></span><span class="go">Ver →</span></button>` : ""; }
 }
 
 function renderSponsors(){
