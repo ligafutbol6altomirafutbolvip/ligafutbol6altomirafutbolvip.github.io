@@ -283,6 +283,10 @@ td.wrapc{white-space:normal;min-width:140px}
 .award p{margin:4px 0 0;color:var(--muted);font-size:14px}
 .award .lead{color:var(--fg);font-weight:600;margin-top:8px}
 .rules{display:grid;gap:10px;font-size:14px}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;align-items:start}
+.rcard h3{color:var(--lime);font-size:18px;margin-bottom:8px}.rcard p{margin:0 0 8px}.rcard p:last-child,.rcard ul:last-child{margin-bottom:0}
+.rcard.key{grid-column:1/-1;border-color:color-mix(in srgb,var(--lime) 50%,var(--line));background:linear-gradient(135deg,color-mix(in srgb,var(--lime) 8%,var(--surface)),var(--surface) 60%)}
+.rcard.key h3{font-size:22px}
 .rules details{border-top:1px solid var(--line);padding-top:10px}
 .rules summary{cursor:pointer;font-weight:600}
 .rules p{margin:6px 0 0;color:var(--muted)}
@@ -448,7 +452,8 @@ dialog.pcard[open]{animation:fadein .2s ease}
     <button class="tab" role="tab" data-t="playoffs">Play-offs</button>
     <button class="tab" role="tab" data-t="aficion">Mejor afición</button>
     <button class="tab" role="tab" data-t="ofertas">Ofertas</button>
-    <button class="tab" role="tab" data-t="premios">Premios y normas</button>
+    <button class="tab" role="tab" data-t="premios">Premios</button>
+    <button class="tab" role="tab" data-t="normas">Normas</button>
   </div>
 </nav>
 
@@ -465,7 +470,8 @@ dialog.pcard[open]{animation:fadein .2s ease}
   <button data-goto="playoffs">Play-offs</button>
   <button data-goto="aficion">Mejor afición</button>
   <button data-goto="ofertas">Ofertas</button>
-  <button data-goto="premios">Premios y normas</button>
+  <button data-goto="premios">Premios</button>
+  <button data-goto="normas">Normas</button>
 </div></div>
 
 <main><div class="wrap">
@@ -582,19 +588,24 @@ dialog.pcard[open]{animation:fadein .2s ease}
 <section id="premios" class="stack" hidden>
   <h2>Premios</h2>
   <div class="awards" id="awards"></div>
-  <div class="panel rules">
-    <h3>Normas principales</h3>
-    <details><summary>Formato y duración</summary><p>5 jugadores de campo más portero. Dos partes de 25 minutos a reloj corrido con 5 minutos de descanso. Cambios ilimitados.</p></details>
-    <details><summary>Jugadores y convocatoria</summary><p>Cada equipo puede convocar un máximo de 12 jugadores por partido. La plantilla puede tener más jugadores inscritos, pero solo 12 pueden estar convocados en cada partido.</p></details>
-    <details><summary>Balón oficial</summary><p>Cada equipo debe llevar al partido el balón oficial de la liga. Es obligatorio.</p></details>
-    <details><summary>Equipación y dorsal</summary><p>Camiseta del mismo color para todo el equipo; si coincide con el rival, el visitante usa petos. El portero lleva un color distinto. Dorsal obligatorio para registrar goles, MVP y tarjetas.</p></details>
-    <details><summary>Puntualidad</summary><p>Presentarse al menos 10 minutos antes. Más de 10 minutos de retraso sin causa justificada: partido perdido 0–3. Con 4 jugadores más portero el partido empieza y el resto se incorpora al llegar.</p></details>
-    <details><summary>Aplazamientos y cambio de hora</summary><p>Cada jornada se juega en su fin de semana, de viernes a domingo. Los días y horas de cada partido se confirman y se publican en la pestaña Jornadas. Cualquier aplazamiento o cambio de hora debe comunicarse a la organización con al menos 48 horas de antelación: como muy tarde, <b>el jueves por la mañana</b> antes del partido del domingo. A partir del jueves por la tarde ya no se admite ningún aplazamiento ni cambio de hora. Si no se avisa a tiempo, el partido se da por perdido 0–3.</p><p>Cada equipo tiene un máximo de 3 aplazamientos o cambios de hora en toda la temporada. Por organización, no se permite ninguno más.</p></details>
-    <details><summary>Tarjetas y conducta</summary><p>Las amarillas se acumulan: 3 amarillas suponen 1 partido de suspensión. Dos amarillas en el mismo partido son expulsión. Una roja conlleva sanción según la gravedad y el equipo juega con uno menos el resto del partido. Insultos, amenazas o agresiones se sancionan con partidos o con la expulsión de la liga.</p></details>
-    <details><summary>Saques</summary><p>Límite de 4 segundos para sacar de banda y de portería.</p><p>No se puede tirar a portería directamente desde el saque de centro, ni al inicio del partido ni después de un gol.</p><p>En el saque de portería, el pase del portero tiene que botar en su propio campo antes de pasar al campo rival. Si no bota, libre indirecto para el equipo contrario.</p><p>El saque de banda debe hacerse correctamente. Si no, es falta de saque y saca el equipo contrario.</p></details>
-    <details><summary>Banquillos</summary><p>En la zona de banquillos solo pueden estar los jugadores con ficha. El público debe quedarse fuera de los banquillos.</p><p>Está prohibido que los jugadores fumen o beban alcohol en la zona de banquillos. El jugador que lo haga será sancionado.</p></details>
-    <details><summary>Modalidad</summary><p>Reglas de fútbol sobre césped. Saque de banda con la mano y de portería con el pie. Sin fuera de juego. Cesión al portero: no puede coger con la mano un pase con el pie de un compañero.</p></details>
-    <details><summary>Resultados y reclamaciones</summary><p>Cada semana se envían al grupo de capitanes horarios, clasificación y estadísticas. Las reclamaciones se envían por WhatsApp privado al 621 19 17 56 en un plazo máximo de 24 horas.</p></details>
+</section>
+
+<section id="normas" class="stack" hidden>
+  <h2>Normas <small>Reglamento de la liga · obligatorio para todos los equipos</small></h2>
+  <div class="rgrid">
+    <article class="panel rcard key"><h3>Respeto al árbitro</h3><p>Esta es una liga para divertirse y pasarlo bien. Se viene a jugar, no a protestar. El árbitro es la máxima autoridad en el campo, y todas sus decisiones se respetan y no se discuten.</p><p><b>Protestas</b></p><ul style="margin:6px 0 10px;padding-left:20px;display:grid;gap:4px"><li>Cualquier protesta a una decisión del árbitro se sancionará con tarjeta amarilla.</li><li>Si el jugador sigue protestando, se le mostrará la segunda amarilla y será expulsado con tarjeta roja.</li><li>Desde el banquillo tampoco se puede protestar. El jugador o entrenador que proteste desde el banquillo también será sancionado con tarjeta amarilla.</li></ul><p><b>Expulsiones</b></p><ul style="margin:6px 0 10px;padding-left:20px;display:grid;gap:4px"><li>Si un jugador es expulsado, su equipo juega con uno menos el resto del partido.</li><li>Si un equipo se queda con dos jugadores menos por expulsiones, el partido se da por terminado. Si ese equipo va perdiendo, el resultado se queda como esté en ese momento. Si va ganando o empatando, pierde el partido por 0–3.</li><li>Si un jugador expulsado no abandona el campo, o hay cualquier problema con el árbitro, el árbitro podrá dar por terminado el partido. En ese caso, el equipo responsable lo perderá por 0–3.</li></ul><p><b>Tarjetas rojas y reincidencia</b></p><p>Las patadas fuertes o a propósito, encararse con un rival o con el árbitro, los insultos y las agresiones se sancionan con roja directa. Cada roja se sancionará con uno o varios partidos según su gravedad, y en los casos más graves con la expulsión de la liga.</p><p>Los jugadores que reincidan podrán ser expulsados de la competición.</p><p><b>El equipo que, después de haber sido sancionado por conducta inadecuada, vuelva a tenerla una segunda vez será expulsado de la competición.</b></p><p><b>Amarillas</b></p><p>3 amarillas acumuladas suponen 1 partido de suspensión.</p></article>
+    <article class="panel rcard"><h3>Tanganas</h3><p>Se considera tangana cualquier enfrentamiento entre jugadores de los dos equipos: encararse en grupo, empujarse o decirse cosas, aunque no se llegue a las manos.</p><ul style="margin:6px 0 10px;padding-left:20px;display:grid;gap:4px"><li><b>Todos los implicados en una tangana serán expulsados con tarjeta roja</b>, sean del equipo que sean, también los que entren desde el banquillo.</li><li>La sanción de cada jugador se decidirá según su participación.</li><li><b>Si la tangana provoca varias tarjetas rojas, el partido se dará por finalizado.</b> La organización decidirá después qué ocurre con ese partido: si se juega otro día, si queda suspendido o si se da por perdido a los dos equipos.</li></ul></article>
+    <article class="panel rcard"><h3>Faltas acumulativas</h3><ul style="margin:6px 0 10px;padding-left:20px;display:grid;gap:4px"><li>El árbitro cuenta las faltas de cada equipo en cada parte.</li><li>A partir de la 6.ª falta de un equipo en la misma parte, cada falta nueva se castiga con un <b>doble penalti</b>: un tiro directo sin barrera, solo contra el portero, desde el doble de la distancia del penalti.</li><li>El árbitro avisa en voz alta cuando un equipo llega a la 5.ª falta.</li><li>El contador vuelve a cero en el descanso.</li></ul></article>
+    <article class="panel rcard"><h3>Formato y duración</h3><p>5 jugadores de campo más portero. Dos partes de 25 minutos a reloj corrido con 5 minutos de descanso. Cambios ilimitados.</p></article>
+    <article class="panel rcard"><h3>Jugadores y convocatoria</h3><p>Cada equipo puede convocar un máximo de 12 jugadores por partido. La plantilla puede tener más jugadores inscritos, pero solo 12 pueden estar convocados en cada partido.</p></article>
+    <article class="panel rcard"><h3>Balón oficial</h3><p>Cada equipo debe llevar al partido el balón oficial de la liga. Es obligatorio.</p></article>
+    <article class="panel rcard"><h3>Equipación y dorsal</h3><p>Camiseta del mismo color para todo el equipo; si coincide con el rival, el visitante usa petos. El portero lleva un color distinto. Dorsal obligatorio para registrar goles, MVP y tarjetas.</p></article>
+    <article class="panel rcard"><h3>Puntualidad</h3><p>Presentarse al menos 10 minutos antes. Más de 10 minutos de retraso sin causa justificada: partido perdido 0–3. Con 4 jugadores más portero el partido empieza y el resto se incorpora al llegar.</p></article>
+    <article class="panel rcard"><h3>Aplazamientos y cambio de hora</h3><p>Cada jornada se juega en su fin de semana, de viernes a domingo. Los días y horas de cada partido se confirman y se publican en la pestaña Jornadas. Cualquier aplazamiento o cambio de hora debe comunicarse a la organización con al menos 48 horas de antelación: como muy tarde, <b>el jueves por la mañana</b> antes del partido del domingo. A partir del jueves por la tarde ya no se admite ningún aplazamiento ni cambio de hora. Si no se avisa a tiempo, el partido se da por perdido 0–3.</p><p>Cada equipo tiene un máximo de 3 aplazamientos o cambios de hora en toda la temporada. Por organización, no se permite ninguno más.</p></article>
+    <article class="panel rcard"><h3>Saques</h3><p>Límite de 4 segundos para sacar de banda y de portería.</p><p>No se puede tirar a portería directamente desde el saque de centro, ni al inicio del partido ni después de un gol.</p><p>En el saque de portería, el pase del portero tiene que botar en su propio campo antes de pasar al campo rival. Si no bota, libre indirecto para el equipo contrario.</p><p>El saque de banda debe hacerse correctamente. Si no, es falta de saque y saca el equipo contrario.</p></article>
+    <article class="panel rcard"><h3>Banquillos</h3><ul style="margin:6px 0 10px;padding-left:20px;display:grid;gap:4px"><li>En el banquillo solo pueden estar <b>los jugadores del equipo convocados y vestidos para jugar, y el entrenador del equipo</b>.</li><li>No puede estar nadie más: ni afición, ni amigos, ni familiares, ni jugadores lesionados o que no vayan a jugar ese día.</li><li>El público tiene que quedarse fuera de la zona de banquillos.</li><li>Está prohibido fumar o beber alcohol en la zona de banquillos. El jugador que lo haga será sancionado.</li></ul></article>
+    <article class="panel rcard"><h3>Modalidad</h3><p>Reglas de fútbol sobre césped. Saque de banda con la mano y de portería con el pie. Sin fuera de juego. Cesión al portero: no puede coger con la mano un pase con el pie de un compañero.</p></article>
+    <article class="panel rcard"><h3>Resultados y reclamaciones</h3><p>Cada semana se envían al grupo de capitanes horarios, clasificación y estadísticas. Las reclamaciones se envían por WhatsApp privado al 621 19 17 56 en un plazo máximo de 24 horas.</p></article>
   </div>
 </section>
 
@@ -1236,7 +1247,7 @@ let start=(location.hash||"").slice(1); if(!start){try{start=localStorage.getIte
 show(start||"proxima");
 </script>
 
-<script>(function(){var V='1794476000';
+<script>(function(){var V='1794571300';
 fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
  if(!j||!j.v||j.v===V)return;
  var q=new URLSearchParams(location.search); if(q.get('v')===j.v)return;
